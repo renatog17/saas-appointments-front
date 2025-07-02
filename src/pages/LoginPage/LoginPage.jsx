@@ -18,15 +18,6 @@ function LoginPage() {
     e.preventDefault();
     setErro("");
 
-    if (!login.includes("@")) {
-      setErro("Digite um email válido.");
-      return;
-    }
-    if (password.length < 6) {
-      setErro("A senha deve ter no mínimo 6 caracteres.");
-      return;
-    }
-
     try {
       const response = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
@@ -34,16 +25,21 @@ function LoginPage() {
         body: JSON.stringify({ login, password }),
       });
 
+      if (response.status === 401) {
+        setErro("Login ou senha inválidos.");
+        return;
+      }
+
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Erro ao fazer login.");
+        setErro("Erro ao fazer login. Tente novamente mais tarde.");
+        return;
       }
 
       const data = await response.json();
       localStorage.setItem("token", data.token);
       navigate("/dashboard");
     } catch (err) {
-      setErro(err.message || "Erro inesperado. Tente novamente.");
+      setErro("Erro inesperado. Tente novamente.");
     }
   };
 
@@ -52,7 +48,7 @@ function LoginPage() {
       <h1 className="text-2xl font-bold mb-4">Entrar</h1>
       <form className="w-full max-w-sm" onSubmit={handleLogin}>
         <input
-          type="email"
+          type="text"
           placeholder="Email"
           value={login}
           onChange={(e) => setLogin(e.target.value)}

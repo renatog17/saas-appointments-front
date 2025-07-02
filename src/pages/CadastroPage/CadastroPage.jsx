@@ -5,41 +5,51 @@ function CadastroPage() {
   const navigate = useNavigate();
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [erro, setErro] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
-    if (!login.includes("@")) {
-      setErro("Digite um email válido.");
-      return;
-    }
-    if (password.length < 6) {
-      setErro("A senha deve ter no mínimo 6 caracteres.");
-      return;
-    }
-    setErro("");
-    try {
-      // Primeiro: cadastro
-      const registerResponse = await fetch(
-        "http://localhost:8080/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ login, password }),
-        }
-      );
+    setErrors({});
 
-      if (!registerResponse.ok) {
-        const data = await registerResponse.json();
-        throw new Error(data.message || "Erro ao cadastrar.");
+    const registerResponse = await fetch(
+      "http://localhost:8080/auth/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ login, password }),
+      }
+    );
+
+    if (!registerResponse.ok) {
+      let errorData;
+      try {
+        errorData = await registerResponse.json();
+      } catch (e) {
+        errorData = null;
+      }
+      const fieldErrors = {};
+      if (
+        registerResponse.status === 400 &&
+        Array.isArray(errorData) &&
+        errorData.length > 0
+      ) {
+        errorData.forEach((err) => {
+          if (!fieldErrors[err.campo]) {
+            fieldErrors[err.campo] = [];
+          }
+          fieldErrors[err.campo].push(err.mensagem);
+        });
+      } else {
+        fieldErrors.login = [
+          "Não é possível cadastrar esse email. Caso já tenha se cadastrado, recupere a senha.",
+        ];
       }
 
-      console.log("Usuário cadastrado com sucesso");
-
-      // Segundo: login automático
+      setErrors(fieldErrors);
+      return;
+    } else {
       const loginResponse = await fetch("http://localhost:8080/auth/login", {
         method: "POST",
         headers: {
@@ -49,20 +59,14 @@ function CadastroPage() {
       });
 
       if (!loginResponse.ok) {
-        const data = await loginResponse.json();
-        throw new Error(data.message || "Erro ao fazer login automático.");
+        console.error("Erro ao fazer login automaticamente após cadastro.");
+        return;
       }
 
-      const loginData = await loginResponse.json();
-
-      // Armazenar o token/localStorage conforme sua lógica
-      localStorage.setItem("token", loginData.token);
+      const { token } = await loginResponse.json();
+      localStorage.setItem("token", token); // ou sessionStorage
       localStorage.setItem("isFirstLogin", "true");
-
       navigate("/negocio");
-    } catch (err) {
-      console.error("Erro:", err);
-      setErro(err.message || "Erro inesperado. Tente novamente.");
     }
   };
 
@@ -74,21 +78,25 @@ function CadastroPage() {
       >
         <h2 className="text-2xl font-bold mb-6 text-center">Cadastro</h2>
 
-        {erro && <p className="text-red-600 mb-4">{erro}</p>}
-
         <div className="mb-4">
           <label htmlFor="login" className="block mb-1 font-medium">
             Email:
           </label>
           <input
             id="login"
-            type="email"
+            type="text"
             value={login}
             onChange={(e) => setLogin(e.target.value)}
             placeholder="Digite seu email"
             required
             className="w-full border border-gray-300 rounded px-3 py-2"
           />
+          {errors.login &&
+            errors.login.map((msg, idx) => (
+              <p key={idx} className="text-red-500 text-sm mt-1">
+                {msg}
+              </p>
+            ))}
         </div>
 
         <div className="mb-6">
@@ -104,6 +112,12 @@ function CadastroPage() {
             required
             className="w-full border border-gray-300 rounded px-3 py-2"
           />
+          {errors.password &&
+            errors.password.map((msg, idx) => (
+              <p key={idx} className="text-red-500 text-sm mt-1">
+                {msg}
+              </p>
+            ))}
         </div>
 
         <button

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Clock, Mail, LayoutDashboard, Store } from "lucide-react";
 
 function LandingPage() {
   return (
@@ -24,7 +25,7 @@ function LandingPage() {
       </header>
 
       {/* Hero / Slogan */}
-      <section className="flex-1 flex flex-col items-center justify-center px-4 text-center">
+      <section className="my-16 flex-1 flex flex-col items-center justify-center px-4 text-center">
         <h2 className="text-4xl font-extrabold mb-4">
           A solução ideal para o seu negócio
         </h2>
@@ -43,20 +44,24 @@ function LandingPage() {
       {/* Benefícios */}
       <section className="bg-white py-12 px-4 text-center">
         <h3 className="text-2xl font-semibold mb-6">
-          Por que escolher o Appoint?
+          Por que escolher a Zendaa?
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-          <div className="bg-gray-100 p-6 rounded shadow">
-            ✅ Agendamento 24h
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mt-6">
+          <div className="bg-gray-100 p-6 rounded shadow flex flex-col items-center">
+            <Clock className="h-8 w-8 text-blue-500 mb-2" />
+            <span className="font-medium">Agendamento 24h</span>
           </div>
-          <div className="bg-gray-100 p-6 rounded shadow">
-            ✅ Notificações por WhatsApp
+          <div className="bg-gray-100 p-6 rounded shadow flex flex-col items-center">
+            <Mail className="h-8 w-8 text-green-500 mb-2" />
+            <span className="font-medium">Notificações por E-mail</span>
           </div>
-          <div className="bg-gray-100 p-6 rounded shadow">
-            ✅ Painel intuitivo
+          <div className="bg-gray-100 p-6 rounded shadow flex flex-col items-center">
+            <LayoutDashboard className="h-8 w-8 text-purple-500 mb-2" />
+            <span className="font-medium">Painel intuitivo</span>
           </div>
-          <div className="bg-gray-100 p-6 rounded shadow">
-            ✅ Ideal para pequenos negócios
+          <div className="bg-gray-100 p-6 rounded shadow flex flex-col items-center">
+            <Store className="h-8 w-8 text-pink-500 mb-2" />
+            <span className="font-medium">Ideal para pequenos negócios</span>
           </div>
         </div>
       </section>
@@ -66,38 +71,53 @@ function LandingPage() {
         <h3 className="text-2xl font-semibold mb-8">
           Planos para você crescer
         </h3>
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center max-w-5xl mx-auto">
-          <div className="bg-white p-6 rounded shadow w-64">
-            <h4 className="text-xl font-bold mb-2">Solo</h4>
-            <p className="mb-2">1 profissional</p>
-            <p className="text-indigo-600 text-2xl font-bold mb-4">R$ 19/mês</p>
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-stretch max-w-5xl mx-auto mt-6">
+          {/* Plano Solo */}
+          <div className="bg-white p-6 rounded shadow w-64 flex flex-col justify-between">
+            <div>
+              <h4 className="text-xl font-bold mb-2">Solo</h4>
+              <p className="mb-2">1 profissional</p>
+              <p className="text-indigo-600 text-2xl font-bold mb-4">
+                R$ 19/mês
+              </p>
+            </div>
             <Link
               to="/cadastro"
-              className="block bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+              className="block bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 mt-auto"
             >
               Selecionar
             </Link>
           </div>
 
-          <div className="bg-white p-6 rounded shadow w-64 border-2 border-indigo-600">
-            <h4 className="text-xl font-bold mb-2">Equipe</h4>
-            <p className="mb-2">2 a 5 profissionais</p>
-            <p className="text-indigo-600 text-2xl font-bold mb-4">R$ 49/mês</p>
+          {/* Plano Equipe */}
+          <div className="bg-white p-6 rounded shadow w-64 border-2 border-indigo-600 flex flex-col justify-between">
+            <div>
+              <h4 className="text-xl font-bold mb-2">Equipe</h4>
+              <p className="mb-2">2 profissionais</p>
+              <p className="text-indigo-600 text-2xl font-bold mb-4">
+                R$ 39/mês
+              </p>
+            </div>
             <Link
               to="/cadastro"
-              className="block bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+              className="block bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 mt-auto"
             >
               Selecionar
             </Link>
           </div>
 
-          <div className="bg-white p-6 rounded shadow w-64">
-            <h4 className="text-xl font-bold mb-2">Profissional+</h4>
-            <p className="mb-2">2 profissionais</p>
-            <p className="text-indigo-600 text-2xl font-bold mb-4">R$ 29/mês</p>
+          {/* Plano Profissional+ */}
+          <div className="bg-white p-6 rounded shadow w-64 flex flex-col justify-between">
+            <div>
+              <h4 className="text-xl font-bold mb-2">Profissional+</h4>
+              <p className="mb-2">3 ou mais profissionais</p>
+              <p className="text-indigo-600 text-2xl font-bold mb-4">
+                À partir de R$ 59/mês
+              </p>
+            </div>
             <Link
               to="/cadastro"
-              className="block bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+              className="block bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 mt-auto"
             >
               Selecionar
             </Link>
@@ -110,7 +130,7 @@ function LandingPage() {
         <h3 className="text-2xl font-semibold mb-6">
           O que dizem nossos clientes
         </h3>
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="max-w-3xl mx-auto space-y-4 mt-6">
           <blockquote className="italic">
             “Nunca mais perdi um agendamento! Simples e eficaz.” — Ana,
             cabeleireira
@@ -123,7 +143,7 @@ function LandingPage() {
 
       {/* Rodapé */}
       <footer className="bg-white p-4 text-center text-sm text-gray-500">
-        © {new Date().getFullYear()} Appoint. Todos os direitos reservados.
+        © {new Date().getFullYear()} Zendaa. Todos os direitos reservados.
       </footer>
     </div>
   );

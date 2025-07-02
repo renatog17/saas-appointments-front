@@ -8,6 +8,7 @@ import PrivateRoute from "./privateroute/PrivateRoute";
 import FirstAccessRoute from "./privateroute/FirstAccessRoute";
 import Dashboard from "./pages/Dashboard/Dashboard"
 import LoginPage from "./pages/LoginPage/LoginPage";
+import ClientePage from "./pages/ClientePage/ClientePage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/cadastro" element={<CadastroPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/:slug" element={<ClientePage/>} />
 
       {/* Apenas no primeiro acesso após cadastro */}
       <Route
