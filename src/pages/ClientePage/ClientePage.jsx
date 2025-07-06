@@ -72,7 +72,7 @@ const ClientePage = () => {
 
       <div className="mt-16 px-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-1">{tenant.nome}</h1>
-        <p className="text-gray-500 mb-4">slug: {tenant.slug}</p>
+        <p className="text-gray-500 mb-4">@{tenant.slug}</p>
 
         <div className="flex gap-4 mb-6">
           <button
