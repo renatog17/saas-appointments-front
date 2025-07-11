@@ -4,6 +4,7 @@ import Procedimento from "../../components/Procedimento";
 import { LayoutDashboard, ListOrdered, Settings } from "lucide-react";
 import { getTenant } from "../../services/apiService";
 import { useEffect } from "react";
+import ProcedimentoForm from "../../components/ProcedimentoForm";
 
 export default function DashBoard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -11,16 +12,25 @@ export default function DashBoard() {
   const [tenant, setTenant] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "/login"; // ajuste conforme sua rota de login
+  }
+
+  async function carregarTenant() {
+    try {
+      setLoading(true);
+      const res = await getTenant();
+      setTenant(res.data);
+    } catch (err) {
+      console.error("Erro ao carregar tenant:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    getTenant()
-      .then((res) => {
-        setTenant(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Erro ao carregar tenant:", err);
-        setLoading(false);
-      });
+    carregarTenant();
   }, []);
 
   return (
@@ -77,6 +87,12 @@ export default function DashBoard() {
           <h1 className="text-xl font-semibold text-gray-800 capitalize">
             {activeTab}
           </h1>
+          <button
+            onClick={logout}
+            className="text-sm text-red-600 hover:text-red-800 font-medium border border-red-300 px-3 py-1 rounded transition"
+          >
+            Logout
+          </button>
         </div>
 
         {/* Conteúdo dinâmico */}
@@ -98,6 +114,7 @@ export default function DashBoard() {
           {!loading && tenant && activeTab === "procedimentos" && (
             <section className="bg-white p-6 rounded-xl shadow">
               <Procedimento lista={tenant.procedimentos} />
+              <ProcedimentoForm onCriado={carregarTenant} />
             </section>
           )}
 

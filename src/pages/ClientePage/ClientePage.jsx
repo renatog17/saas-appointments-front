@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { getTenantPublic } from "../../services/apiService";
+import { criarAgendamento } from "../../services/apiService";
 
 const ClientePage = () => {
   const { slug } = useParams();
@@ -16,16 +18,11 @@ const ClientePage = () => {
   const horariosDisponiveis = ["09:00", "10:30", "14:00", "15:30", "17:00"];
 
   useEffect(() => {
-    fetch(`http://localhost:8080/tenant/${slug}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Erro ao buscar dados do tenant.");
-        return res.json();
-      })
-      .then(setTenant)
-      .catch((err) => {
-        console.error(err);
-        setErro("Erro ao carregar dados. Tente novamente mais tarde.");
-      });
+    getTenantPublic(slug)
+      .then((res) => setTenant(res.data))
+      .catch(() =>
+        setErro("Erro ao carregar dados. Tente novamente mais tarde.")
+      );
   }, [slug]);
 
   const voltar = () => {
@@ -46,20 +43,31 @@ const ClientePage = () => {
     setEtapa(4);
   };
 
-  const finalizarAgendamento = () => {
-    alert(
-      `Agendamento concluído!\nProcedimento: ${procedimentoSelecionado.nome}\nData: ${dataSelecionada}\nHorário: ${horarioSelecionado}\nEmail: ${email}`
-    );
-    // Resetar
-    setEtapa(1);
-    setProcedimentoSelecionado(null);
-    setDataSelecionada("");
-    setHorarioSelecionado("");
-    setEmail("");
+  const finalizarAgendamento = async () => {
+    const dados = {
+      procedimentoId: procedimentoSelecionado.id,
+      dateTime: `${dataSelecionada}T${horarioSelecionado}`,
+      email,
+    };
+
+    try {
+      await criarAgendamento(dados);
+      alert("Agendamento concluído com sucesso!");
+      // Resetar
+      setEtapa(1);
+      setProcedimentoSelecionado(null);
+      setDataSelecionada("");
+      setHorarioSelecionado("");
+      setEmail("");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao criar agendamento. Tente novamente.");
+    }
   };
 
   if (erro) return <div className="text-center text-red-500">{erro}</div>;
-  if (!tenant) return <div className="text-center text-gray-500">Carregando...</div>;
+  if (!tenant)
+    return <div className="text-center text-gray-500">Carregando...</div>;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -81,9 +89,9 @@ const ClientePage = () => {
           >
             Agendar
           </button>
-          <button className="bg-gray-700 text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition">
+          {/* <button className="bg-gray-700 text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition">
             Área do Cliente
-          </button>
+          </button> */}
         </div>
 
         {/* Etapas */}
@@ -100,7 +108,9 @@ const ClientePage = () => {
                   >
                     <h3 className="text-blue-600 font-semibold">{p.nome}</h3>
                     <p className="text-gray-600">{p.descricao}</p>
-                    <p className="text-green-700 font-bold">R$ {p.valor.toFixed(2)}</p>
+                    <p className="text-green-700 font-bold">
+                      R$ {p.valor.toFixed(2)}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -190,4 +200,4 @@ const ClientePage = () => {
   );
 };
 
-export default ClientePage;   
+export default ClientePage;

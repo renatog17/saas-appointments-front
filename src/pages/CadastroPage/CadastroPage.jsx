@@ -12,7 +12,7 @@ function CadastroPage() {
     setErrors({});
 
     const registerResponse = await fetch(
-      "http://localhost:8080/auth/register",
+      "/api/auth/register",
       {
         method: "POST",
         headers: {
@@ -50,7 +50,7 @@ function CadastroPage() {
       setErrors(fieldErrors);
       return;
     } else {
-      const loginResponse = await fetch("http://localhost:8080/auth/login", {
+      const loginResponse = await fetch("api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

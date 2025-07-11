@@ -31,7 +31,7 @@ const handleSubmit = async (e) => {
 
   const token = localStorage.getItem("token");
   try {
-    const response = await fetch("http://localhost:8080/tenant", {
+    const response = await fetch("/api/tenant", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

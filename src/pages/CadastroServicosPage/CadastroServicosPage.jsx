@@ -30,7 +30,7 @@ function CadastroServicosPage() {
     const token = localStorage.getItem("token");
 
     try {
-      const resposta = await fetch("http://localhost:8080/procedimento", {
+      const resposta = await fetch("/api/procedimento", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
