@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { criarProcedimentos } from "../../services/apiService";
 
 function CadastroServicosPage() {
   const [procedimentos, setProcedimentos] = useState([
-    { nome: "", descricao: "", valor: "" }
+    { nome: "", descricao: "", valor: "" },
   ]);
   const [mensagem, setMensagem] = useState("");
   const navigate = useNavigate();
@@ -15,7 +16,10 @@ function CadastroServicosPage() {
   };
 
   const adicionarProcedimento = () => {
-    setProcedimentos([...procedimentos, { nome: "", descricao: "", valor: "" }]);
+    setProcedimentos([
+      ...procedimentos,
+      { nome: "", descricao: "", valor: "" },
+    ]);
   };
 
   const removerProcedimento = (index) => {
@@ -27,28 +31,25 @@ function CadastroServicosPage() {
     e.preventDefault();
     setMensagem("");
 
-    const token = localStorage.getItem("token");
-
     try {
-      const resposta = await fetch("/api/procedimento", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(procedimentos)
-      });
-
-      if (resposta.ok) {
-        setMensagem("Procedimentos cadastrados com sucesso!");
-        localStorage.removeItem("isFirstLogin");
-        navigate("/dashboard");
-      } else {
-        const erro = await resposta.json();
-        setMensagem("Erro ao cadastrar: " + (erro.message || resposta.status));
-      }
+      await criarProcedimentos(procedimentos);
+      setMensagem("Procedimentos cadastrados com sucesso!");
+      localStorage.removeItem("isFirstLogin");
+      navigate("/dashboard");
     } catch (err) {
-      setMensagem("Erro na requisição: " + err.message);
+      if (err.response) {
+        // Erro do servidor com resposta
+        setMensagem(
+          "Erro ao cadastrar: " +
+            (err.response.data.message || err.response.status)
+        );
+      } else if (err.request) {
+        // Sem resposta
+        setMensagem("Sem resposta do servidor.");
+      } else {
+        // Outro erro
+        setMensagem("Erro na requisição: " + err.message);
+      }
     }
   };
 
@@ -60,7 +61,10 @@ function CadastroServicosPage() {
         </h2>
         <form onSubmit={handleSubmit}>
           {procedimentos.map((p, index) => (
-            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div
+              key={index}
+              className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
+            >
               <input
                 type="text"
                 placeholder="Nome"
@@ -73,7 +77,9 @@ function CadastroServicosPage() {
                 type="text"
                 placeholder="Descrição"
                 value={p.descricao}
-                onChange={(e) => handleChange(index, "descricao", e.target.value)}
+                onChange={(e) =>
+                  handleChange(index, "descricao", e.target.value)
+                }
                 required
                 className="border rounded p-2 w-full"
               />

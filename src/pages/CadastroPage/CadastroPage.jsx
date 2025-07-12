@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { cadastrarTenant, fazerLogin } from "../../services/apiService";
+
 
 function CadastroPage() {
   const navigate = useNavigate();
@@ -8,67 +10,48 @@ function CadastroPage() {
   const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
+  e.preventDefault();
+  setErrors({});
 
-    const registerResponse = await fetch(
-      "/api/auth/register",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ login, password }),
-      }
-    );
-
-    if (!registerResponse.ok) {
-      let errorData;
-      try {
-        errorData = await registerResponse.json();
-      } catch (e) {
-        errorData = null;
-      }
-      const fieldErrors = {};
-      if (
-        registerResponse.status === 400 &&
-        Array.isArray(errorData) &&
-        errorData.length > 0
-      ) {
-        errorData.forEach((err) => {
-          if (!fieldErrors[err.campo]) {
-            fieldErrors[err.campo] = [];
-          }
-          fieldErrors[err.campo].push(err.mensagem);
-        });
-      } else {
-        fieldErrors.login = [
-          "Não é possível cadastrar esse email. Caso já tenha se cadastrado, recupere a senha.",
-        ];
-      }
-
-      setErrors(fieldErrors);
-      return;
-    } else {
-      const loginResponse = await fetch("api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ login, password }),
+  try {
+    // 1. Cadastrar o tenant
+    await cadastrarTenant({ login, password });
+  } catch (error) {
+    const response = error.response;
+    const fieldErrors = {};
+    
+    if (response && response.status === 400 && Array.isArray(response.data)) {
+      response.data.forEach((err) => {
+        if (!fieldErrors[err.campo]) {
+          fieldErrors[err.campo] = [];
+        }
+        fieldErrors[err.campo].push(err.mensagem);
       });
-
-      if (!loginResponse.ok) {
-        console.error("Erro ao fazer login automaticamente após cadastro.");
-        return;
-      }
-
-      const { token } = await loginResponse.json();
-      localStorage.setItem("token", token); // ou sessionStorage
-      localStorage.setItem("isFirstLogin", "true");
-      navigate("/negocio");
+    } else {
+      fieldErrors.login = [
+        "Não é possível cadastrar esse email. Caso já tenha se cadastrado, recupere a senha.",
+      ];
     }
-  };
+    
+    setErrors(fieldErrors);
+    return;
+  }
+  
+  try {
+    // 2. Fazer login automático
+    const loginResponse = await fazerLogin({ login, password });
+    const { token } = loginResponse.data;
+    
+    localStorage.setItem("token", token);
+    localStorage.setItem("isFirstLogin", "true");
+    
+    navigate("/negocio");
+  } catch (error) {
+    console.error("Erro completo:", error);
+    console.error("Erro ao fazer login automaticamente após cadastro.");
+    // Aqui você pode exibir um erro genérico se quiser
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">

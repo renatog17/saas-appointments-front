@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { criarTenant } from "../../services/apiService";
 
 function NegocioPage() {
   const navigate = useNavigate();
@@ -14,52 +15,47 @@ function NegocioPage() {
     return regex.test(valor);
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setErro("");
-  setSucesso("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErro("");
+    setSucesso("");
 
-  if (!nome.trim() || !slug.trim()) {
-    setErro("Preencha todos os campos.");
-    return;
-  }
-
-  if (!validarSlug(slug)) {
-    setErro("O slug deve conter apenas letras minúsculas, números e hífens.");
-    return;
-  }
-
-  const token = localStorage.getItem("token");
-  try {
-    const response = await fetch("/api/tenant", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({ nome, slug }),
-    });
-
-    if (response.status === 409) {
-      setErro("Esse slug já está em uso. Tente outro.");
+    if (!nome.trim() || !slug.trim()) {
+      setErro("Preencha todos os campos.");
       return;
     }
 
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || "Erro ao cadastrar o negócio.");
+    if (!validarSlug(slug)) {
+      setErro("O slug deve conter apenas letras minúsculas, números e hífens.");
+      return;
     }
-    navigate("/servicos");
-    setSucesso("Negócio cadastrado com sucesso!");
-    console.log("Negócio cadastrado:", { nome, slug });
 
-    // Aqui você pode redirecionar ou prosseguir para outra etapa, se quiser
+    const token = localStorage.getItem("token");
 
-  } catch (err) {
-    console.error("Erro ao cadastrar o negócio:", err);
-    setErro(err.message || "Erro inesperado. Tente novamente.");
-  }
-};
+    try {
+      const response = await criarTenant(
+        { nome, slug },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setSucesso("Negócio cadastrado com sucesso!");
+      console.log("Negócio cadastrado:", response.data);
+      navigate("/servicos");
+    } catch (err) {
+      if (err.response?.status === 409) {
+        setErro("Esse slug já está em uso. Tente outro.");
+      } else {
+        console.error("Erro ao cadastrar o negócio:", err);
+        setErro(
+          err.response?.data?.message || "Erro inesperado. Tente novamente."
+        );
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -67,13 +63,17 @@ const handleSubmit = async (e) => {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded shadow-md w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Cadastro do Negócio</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Cadastro do Negócio
+        </h2>
 
         {erro && <p className="text-red-600 mb-4">{erro}</p>}
         {sucesso && <p className="text-green-600 mb-4">{sucesso}</p>}
 
         <div className="mb-4">
-          <label htmlFor="nome" className="block mb-1 font-medium">Nome do negócio:</label>
+          <label htmlFor="nome" className="block mb-1 font-medium">
+            Nome do negócio:
+          </label>
           <input
             id="nome"
             type="text"
@@ -99,7 +99,11 @@ const handleSubmit = async (e) => {
             className="w-full border border-gray-300 rounded px-3 py-2"
           />
           <p className="text-sm text-gray-500 mt-1">
-            Exemplo de endereço: <strong>appoint.com.br/<span className="text-gray-700">{slug || "seu-negocio"}</span></strong>
+            Exemplo de endereço:{" "}
+            <strong>
+              appoint.com.br/
+              <span className="text-gray-700">{slug || "seu-negocio"}</span>
+            </strong>
           </p>
         </div>
 
