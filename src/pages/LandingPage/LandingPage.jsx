@@ -18,7 +18,7 @@ function LandingPage() {
     <div className="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
       {/* Cabeçalho */}
       <header className="bg-white shadow p-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-indigo-600">Zendaa</h1>
+        <h1 className="text-2xl font-bold text-indigo-600">ZendaaVip</h1>
 
         <div className="flex gap-2">
           <Link

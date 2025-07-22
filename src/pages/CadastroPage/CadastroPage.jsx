@@ -1,115 +1,115 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cadastrarTenant, fazerLogin } from "../../services/apiService";
-
+import EmailStep from "../../components/CadastroSteps/EmailStep";
+import PasswordStep from "../../components/CadastroSteps/PasswordStep";
+import NameAndTenantStep from "../../components/CadastroSteps/NameAndTenantStep";
+import AddProcedureStep from "../../components/CadastroSteps/AddProcedureStep";
 
 function CadastroPage() {
-  const navigate = useNavigate();
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
+  const [step, setStep] = useState(0);
+  const [cadastroData, setCadastroData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    tenant: "",
+    procedures: [],
+  });
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  setErrors({});
-
-  try {
-    // 1. Cadastrar o tenant
-    await cadastrarTenant({ login, password });
-  } catch (error) {
-    const response = error.response;
-    const fieldErrors = {};
-    
-    if (response && response.status === 400 && Array.isArray(response.data)) {
-      response.data.forEach((err) => {
-        if (!fieldErrors[err.campo]) {
-          fieldErrors[err.campo] = [];
-        }
-        fieldErrors[err.campo].push(err.mensagem);
-      });
-    } else {
-      fieldErrors.login = [
-        "Não é possível cadastrar esse email. Caso já tenha se cadastrado, recupere a senha.",
-      ];
+  useEffect(() => {
+    if (step === 4) {
+      handleSubmit();
     }
-    
-    setErrors(fieldErrors);
-    return;
+  }, [step]);
+
+  const handleSubmit = async () =>{
+    await cadastrarTenant(cadastroData)
+    //eu parei aqui, eu estava no back end pensando como fazer a parte de salvar 
   }
-  
-  try {
-    // 2. Fazer login automático
-    const loginResponse = await fazerLogin({ login, password });
-    const { token } = loginResponse.data;
-    
-    localStorage.setItem("token", token);
-    localStorage.setItem("isFirstLogin", "true");
-    
-    navigate("/negocio");
-  } catch (error) {
-    console.error("Erro completo:", error);
-    console.error("Erro ao fazer login automaticamente após cadastro.");
-    // Aqui você pode exibir um erro genérico se quiser
-  }
-};
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-full max-w-md"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">Cadastro</h2>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="bg-white shadow-2xl rounded-2xl p-6 sm:p-10 w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Cadastro
+        </h1>
 
-        <div className="mb-4">
-          <label htmlFor="login" className="block mb-1 font-medium">
-            Email:
-          </label>
-          <input
-            id="login"
-            type="text"
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
-            placeholder="Digite seu email"
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2"
+        {step === 0 && (
+          <EmailStep
+            onNext={(email) => {
+              setCadastroData((prev) => ({ ...prev, email }));
+              setStep(1);
+            }}
           />
-          {errors.login &&
-            errors.login.map((msg, idx) => (
-              <p key={idx} className="text-red-500 text-sm mt-1">
-                {msg}
-              </p>
-            ))}
-        </div>
+        )}
 
-        <div className="mb-6">
-          <label htmlFor="password" className="block mb-1 font-medium">
-            Senha:
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Crie uma senha"
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2"
+        {step === 1 && (
+          <PasswordStep
+            onNext={(password) => {
+              setCadastroData((prev) => ({ ...prev, password }));
+              setStep(2);
+            }}
           />
-          {errors.password &&
-            errors.password.map((msg, idx) => (
-              <p key={idx} className="text-red-500 text-sm mt-1">
-                {msg}
-              </p>
-            ))}
-        </div>
+        )}
 
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition"
-        >
-          Cadastrar
-        </button>
-      </form>
+        {step === 2 && (
+          <NameAndTenantStep
+            onNext={(name, tenant) => {
+              setCadastroData((prev) => ({ ...prev, name, tenant }));
+              setStep(3);
+            }}
+          />
+        )}
+
+        {step === 3 && (
+          <AddProcedureStep
+            onNext={(procedures) => {
+              setCadastroData((prev) => ({ ...prev, procedures }));
+              setStep(4);
+            }}
+          />
+        )}
+
+        {step === 4 && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Revisar Informações
+            </h2>
+            <div className="text-gray-700 space-y-2">
+              <p>
+                <strong>Email:</strong> {cadastroData.email}
+              </p>
+              <p>
+                <strong>Senha:</strong> {cadastroData.password}
+              </p>
+              <p>
+                <strong>Nome:</strong> {cadastroData.name}
+              </p>
+              <p>
+                <strong>Tenant:</strong> {cadastroData.tenant}
+              </p>
+              <div>
+                <strong>Procedimentos:</strong>
+                <ul className="list-disc list-inside">
+                  {cadastroData.procedures.map((procedure, index) => (
+                    <li key={index}>
+                      {procedure.nome} - {procedure.descricao} - R${" "}
+                      {procedure.valor}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <button
+              className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+              onClick={() => alert("Dados prontos para envio!")}
+            >
+              Confirmar Cadastro
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

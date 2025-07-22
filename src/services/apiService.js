@@ -1,7 +1,7 @@
 // src/services/apiService.js
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -28,17 +28,21 @@ export const publicApi = axios.create({
   }
 });
 //auth
-export const cadastrarTenant = (dados) => publicApi.post("/auth/register", dados)
-export const fazerLogin = (dados) => publicApi.post("/auth/login", dados)
+export const cadastrarTenant = (dados) => publicApi.post('/auth/register', dados)
+export const fazerLogin = (dados) => publicApi.post('/auth/login', dados)
+export const verificarDisponibilidadeEmail = (email) => publicApi.get(`auth/${email}`)
 
-export const getTenantPublic = (slug) => publicApi.get(`/tenant/${slug}`);
-export const criarAgendamento = (dados) => publicApi.post('/agendamento', dados);
+//public
+export const getHorariosAgendamentos = (tenantId) => publicApi.get(`agendamento/${tenantId}`)
+export const criarAgendamento = (dados) => publicApi.post('/agendamento', dados)
+export const getTenantPublic = (slug) => publicApi.get(`/tenant/${slug}`)
 
-export const getTenant = () => api.get('/tenant');
-export const arquivarProcedimento = (id) => api.patch(`/procedimento/${id}`);
-export const excluirProcedimento = (id) => api.delete(`/procedimento/${id}`);
-export const criarProcedimentos = (procedimentos) => api.post('/procedimento', procedimentos);
+//private
+export const arquivarProcedimento = (id) => api.patch(`/procedimento/${id}`)
+export const excluirProcedimento = (id) => api.delete(`/procedimento/${id}`)
+export const criarProcedimentos = (procedimentos) => api.post('/procedimento', procedimentos)
 export const criarTenant = (tenant) => api.post('/tenant', tenant)
+export const getTenant = () => api.get('/tenant')
 
 
 export default api;

@@ -1,20 +1,28 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import TenantInfo from "../../components/TenantInfo";
 import Procedimento from "../../components/Procedimento";
-import { LayoutDashboard, ListOrdered, Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  ListOrdered,
+  Settings,
+  ChevronDown,
+  LogOut,
+  User,
+} from "lucide-react";
 import { getTenant } from "../../services/apiService";
 import { useEffect } from "react";
 import ProcedimentoForm from "../../components/ProcedimentoForm";
 
 export default function DashBoard() {
   const [activeTab, setActiveTab] = useState("dashboard");
-
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
   const [tenant, setTenant] = useState(null);
   const [loading, setLoading] = useState(true);
 
   function logout() {
     localStorage.removeItem("token");
-    window.location.href = "/login"; // ajuste conforme sua rota de login
+    window.location.href = "/"; // ajuste conforme sua rota de login
   }
 
   async function carregarTenant() {
@@ -32,13 +40,21 @@ export default function DashBoard() {
   useEffect(() => {
     carregarTenant();
   }, []);
-
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md border-r hidden md:flex flex-col p-6">
-        <h2 className="text-2xl font-bold text-indigo-600 mb-8">Zendaavip</h2>
-        <nav className="space-y-4">
+        <h2 className="text-2xl font-bold text-indigo-600 mb-8">ZendaaVip</h2>
+        <nav className="space-y-4 mt-4">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={`flex items-center gap-2 text-left w-full px-2 py-1 rounded 
@@ -83,16 +99,42 @@ export default function DashBoard() {
       {/* Conteúdo principal */}
       <div className="flex-1 flex flex-col">
         {/* Top Header */}
-        <div className="bg-white shadow px-6 py-4 flex justify-between items-center">
+        <div className="bg-white shadow px-6 py-4 flex justify-between items-center relative">
           <h1 className="text-xl font-semibold text-gray-800 capitalize">
             {activeTab}
           </h1>
-          <button
-            onClick={logout}
-            className="text-sm text-red-600 hover:text-red-800 font-medium border border-red-300 px-3 py-1 rounded transition"
-          >
-            Logout
-          </button>
+
+          {/* Dropdown Menu */}
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-indigo-600"
+            >
+              Meu Perfil <ChevronDown size={16} />
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-44 bg-white border rounded shadow-lg z-50">
+                <button
+                  onClick={() => {
+                    navigate("/editar-perfil");
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <User size={16} />
+                  Editar Perfil
+                </button>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                >
+                  <LogOut size={16} />
+                  Sair
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Conteúdo dinâmico */}
@@ -101,7 +143,7 @@ export default function DashBoard() {
 
           {!loading && tenant && activeTab === "dashboard" && (
             <section className="bg-white p-6 rounded-xl shadow">
-              <TenantInfo nome={tenant.nome} slug={tenant.slug} />
+              <TenantInfo nome={tenant.nome} slug={tenant.slug} srcImg={tenant.img} />
               {/*
               Aqui o usuário poderá escolher um layout;
               Ver a foto do perfil que o usuário pode ver;

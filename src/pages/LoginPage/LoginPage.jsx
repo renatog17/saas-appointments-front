@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { fazerLogin } from "../../services/apiService";
 
 function LoginPage() {
   const [login, setLogin] = useState("");
@@ -19,27 +20,18 @@ function LoginPage() {
     setErro("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ login, password }),
-      });
+      const response = await fazerLogin({ login, password });
 
-      if (response.status === 401) {
-        setErro("Login ou senha inválidos.");
-        return;
-      }
-
-      if (!response.ok) {
-        setErro("Erro ao fazer login. Tente novamente mais tarde.");
-        return;
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", response.data.token);
       navigate("/dashboard");
     } catch (err) {
-      setErro("Erro inesperado. Tente novamente.");
+      if (err.response?.status === 401) {
+        setErro("Login ou senha inválidos.");
+      } else if (err.response) {
+        setErro("Erro ao fazer login. Tente novamente mais tarde.");
+      } else {
+        setErro("Erro inesperado. Tente novamente.");
+      }
     }
   };
 
@@ -67,6 +59,14 @@ function LoginPage() {
           className="bg-indigo-600 text-white w-full p-2 rounded hover:bg-indigo-700 transition"
         >
           Entrar
+        </button>
+
+        {/* Botão de Voltar */}
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 text-indigo-600 hover:underline"
+        >
+          Voltar para a página inicial
         </button>
       </form>
     </div>
