@@ -12,6 +12,9 @@ import {
 import { getTenant } from "../../services/apiService";
 import { useEffect } from "react";
 import ProcedimentoForm from "../../components/ProcedimentoForm";
+import { logout } from "../../services/apiService";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function DashBoard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -19,10 +22,17 @@ export default function DashBoard() {
   const menuRef = useRef(null);
   const [tenant, setTenant] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { realizarLogout } = useAuth();
 
-  function logout() {
-    localStorage.removeItem("token");
-    window.location.href = "/"; // ajuste conforme sua rota de login
+ async function handleLogout() {
+    try {
+      const response = await realizarLogout();
+      console.log(response)
+      navigate("/login"); // ou rota de login
+    } catch (err) {
+      console.error("Erro ao fazer logout", err);
+    }
   }
 
   async function carregarTenant() {
@@ -126,7 +136,7 @@ export default function DashBoard() {
                   Editar Perfil
                 </button>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                 >
                   <LogOut size={16} />

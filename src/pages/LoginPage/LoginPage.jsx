@@ -1,37 +1,26 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fazerLogin } from "../../services/apiService";
+import { useAuth } from "../../context/AuthContext";
 
 function LoginPage() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [erro, setErro] = useState("");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/dashboard"); // se já estiver logado, vai direto pro painel
-    }
-  }, [navigate]);
+  const { setAuthenticated } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErro("");
-
     try {
       const response = await fazerLogin({ login, password });
-
-      localStorage.setItem("token", response.data.token);
+      console.log(response)
+      setAuthenticated(true);
       navigate("/dashboard");
     } catch (err) {
-      if (err.response?.status === 401) {
-        setErro("Login ou senha inválidos.");
-      } else if (err.response) {
-        setErro("Erro ao fazer login. Tente novamente mais tarde.");
-      } else {
-        setErro("Erro inesperado. Tente novamente.");
-      }
+      console.error("Erro no login:", err);
+      setErro("Usuário ou senha inválidos");
     }
   };
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getTenantPublic } from "../../services/apiService";
+import { existTenantBySlug } from "../../services/apiService";
 
 export default function NameAndTenantStep({ onNext }) {
   const [name, setName] = useState("");
@@ -17,14 +17,16 @@ export default function NameAndTenantStep({ onNext }) {
     setError(null);
 
     try {
-      await getTenantPublic(tenant); // se retornar, slug já existe
-      setError("Este nome de empresa (slug) já está em uso.");
-    } catch (err) {
-      if (err.response?.status === 404) {
-        onNext(name, tenant);
+      const response = await existTenantBySlug(tenant);
+      const disponivel = response.data;
+
+      if (disponivel) {
+        setError("Este slug já está em uso.");
       } else {
-        setError("Erro ao verificar o nome da empresa.");
+        onNext(name, tenant);
       }
+    } catch (err) {
+      setError("Erro ao verificar slug. Tente novamente.");
     } finally {
       setChecking(false);
     }
@@ -52,9 +54,7 @@ export default function NameAndTenantStep({ onNext }) {
         className="w-full border border-gray-300 rounded-xl p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
-      {error && (
-        <p className="text-red-600 text-sm mb-3">{error}</p>
-      )}
+      {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
 
       <button
         onClick={handleNext}

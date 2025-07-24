@@ -1,20 +1,27 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { cadastrarTenant, fazerLogin } from "../../services/apiService";
+import { useState, useEffect } from "react";
+import { postTenant} from "../../services/apiService";
 import EmailStep from "../../components/CadastroSteps/EmailStep";
 import PasswordStep from "../../components/CadastroSteps/PasswordStep";
 import NameAndTenantStep from "../../components/CadastroSteps/NameAndTenantStep";
 import AddProcedureStep from "../../components/CadastroSteps/AddProcedureStep";
+import ConfirmacaoEmailStep from "../../components/CadastroSteps/ConfirmacaoEmailStep";
+import CadastroSucessoStep from "../../components/CadastroSteps/CadastroSucessoStep";
 
 function CadastroPage() {
   const [step, setStep] = useState(0);
   const [cadastroData, setCadastroData] = useState({
-    email: "",
-    password: "",
-    name: "",
-    tenant: "",
-    procedures: [],
+    nome: "",
+    slug: "",
+    procedimentos: [],
+    register: {
+      login: "",
+      password: "",
+    },
   });
+
+  useEffect(() => {
+    console.log("Cadastro atualizado:", cadastroData);
+  }, [cadastroData]);
 
   useEffect(() => {
     if (step === 4) {
@@ -22,10 +29,13 @@ function CadastroPage() {
     }
   }, [step]);
 
-  const handleSubmit = async () =>{
-    await cadastrarTenant(cadastroData)
-    //eu parei aqui, eu estava no back end pensando como fazer a parte de salvar 
-  }
+  const handleSubmit = async () => {
+    const response = await postTenant(cadastroData);
+    if (response.ok) {
+      alert("Cadastro realizado com sucesso! Verifique seu e-mail.");
+    }
+    //eu parei aqui, eu estava no back end pensando como fazer a parte de salvar
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
@@ -36,8 +46,14 @@ function CadastroPage() {
 
         {step === 0 && (
           <EmailStep
-            onNext={(email) => {
-              setCadastroData((prev) => ({ ...prev, email }));
+            onNext={(login) => {
+              setCadastroData((prev) => ({
+                ...prev,
+                register: {
+                  ...prev.register,
+                  login,
+                },
+              }));
               setStep(1);
             }}
           />
@@ -46,7 +62,13 @@ function CadastroPage() {
         {step === 1 && (
           <PasswordStep
             onNext={(password) => {
-              setCadastroData((prev) => ({ ...prev, password }));
+              setCadastroData((prev) => ({
+                ...prev,
+                register: {
+                  ...prev.register,
+                  password,
+                },
+              }));
               setStep(2);
             }}
           />
@@ -54,8 +76,12 @@ function CadastroPage() {
 
         {step === 2 && (
           <NameAndTenantStep
-            onNext={(name, tenant) => {
-              setCadastroData((prev) => ({ ...prev, name, tenant }));
+            onNext={(nome, slug) => {
+              setCadastroData((prev) => ({
+                ...prev,
+                nome,
+                slug,
+              }));
               setStep(3);
             }}
           />
@@ -63,52 +89,25 @@ function CadastroPage() {
 
         {step === 3 && (
           <AddProcedureStep
-            onNext={(procedures) => {
-              setCadastroData((prev) => ({ ...prev, procedures }));
+            onNext={(procedimentos) => {
+              setCadastroData((prev) => ({
+                ...prev,
+                procedimentos,
+              }));
               setStep(4);
             }}
           />
         )}
 
         {step === 4 && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4 text-center">
-              Revisar Informações
-            </h2>
-            <div className="text-gray-700 space-y-2">
-              <p>
-                <strong>Email:</strong> {cadastroData.email}
-              </p>
-              <p>
-                <strong>Senha:</strong> {cadastroData.password}
-              </p>
-              <p>
-                <strong>Nome:</strong> {cadastroData.name}
-              </p>
-              <p>
-                <strong>Tenant:</strong> {cadastroData.tenant}
-              </p>
-              <div>
-                <strong>Procedimentos:</strong>
-                <ul className="list-disc list-inside">
-                  {cadastroData.procedures.map((procedure, index) => (
-                    <li key={index}>
-                      {procedure.nome} - {procedure.descricao} - R${" "}
-                      {procedure.valor}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <button
-              className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
-              onClick={() => alert("Dados prontos para envio!")}
-            >
-              Confirmar Cadastro
-            </button>
-          </div>
+          <ConfirmacaoEmailStep
+            login={cadastroData.register.login}
+            onSuccess={() => setStep(5)} 
+          />
         )}
+
+        {step === 5 && <CadastroSucessoStep />}
+
       </div>
     </div>
   );

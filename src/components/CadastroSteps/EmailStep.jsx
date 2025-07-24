@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { verificarDisponibilidadeEmail } from "../../services/apiService";
+import { existUserByEmail } from "../../services/apiService";
 
 export default function EmailStep({ onNext }) {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ export default function EmailStep({ onNext }) {
     setError(null);
 
     try {
-      const response = await verificarDisponibilidadeEmail(email);
+      const response = await existUserByEmail(email);
       const disponivel = response.data; // seu endpoint retorna true ou false
 
       if (disponivel) {

@@ -2,10 +2,8 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import CadastroPage from "./pages/CadastroPage/CadastroPage";
-import NegocioPage from "./pages/NegocioPage/NegocioPage";
-import CadastroServicosPage from "./pages/CadastroServicosPage/CadastroServicosPage";
 import PrivateRoute from "./privateroute/PrivateRoute";
-import FirstAccessRoute from "./privateroute/FirstAccessRoute";
+import PublicRoute from "./privateroute/PublicRoute";
 import Dashboard from "./pages/Dashboard/Dashboard"
 import LoginPage from "./pages/LoginPage/LoginPage";
 import AgendamentoPage from "./pages/AgendamentoPage/AgendamentoPage";
@@ -16,29 +14,20 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/cadastro" element={<CadastroPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/:slug" element={<AgendamentoPage/>} />
+      
+      {/* Protege a rota /login para não permitir acesso de usuários já autenticados */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
+
+      <Route path="/:slug" element={<AgendamentoPage />} />
       <Route path="/agendamento/sucesso" element={<AgendamentoSucesso />} />
-
-      {/* Apenas no primeiro acesso após cadastro */}
-      <Route
-        path="/negocio"
-        element={
-          <FirstAccessRoute>
-            <NegocioPage />
-          </FirstAccessRoute>
-        }
-      />
-      <Route
-        path="/servicos"
-        element={
-          <FirstAccessRoute>
-            <CadastroServicosPage />
-          </FirstAccessRoute>
-        }
-      />
-
-      {/* Rotas normais depois da configuração */}
+      
       <Route
         path="/dashboard"
         element={
