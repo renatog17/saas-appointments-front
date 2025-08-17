@@ -15,6 +15,7 @@ import ProcedimentoForm from "../../components/ProcedimentoForm";
 import { logout } from "../../services/apiService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import Agendamentos from "../../components/Agendamentos";
 
 export default function DashBoard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -160,6 +161,9 @@ export default function DashBoard() {
               Ver capa;
               Definir cores;
               */}
+
+            <Agendamentos tenantId = {tenant.id}></Agendamentos>
+            
             </section>
           )}
 

@@ -1,18 +1,7 @@
 import { Link } from "react-router-dom";
 import { Clock, Mail, LayoutDashboard, Store } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 function LandingPage() {
-  
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // ou localStorage
-    if (token) {
-      navigate("/dashboard");
-    }
-  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 flex flex-col">

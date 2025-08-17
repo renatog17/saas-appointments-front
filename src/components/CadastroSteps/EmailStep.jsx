@@ -11,6 +11,12 @@ export default function EmailStep({ onNext }) {
       setError("Por favor, informe um email.");
       return;
     }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Por favor, informe um email válido.");
+      return;
+    }
 
     setChecking(true);
     setError(null);

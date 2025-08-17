@@ -4,7 +4,7 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 import CadastroPage from "./pages/CadastroPage/CadastroPage";
 import PrivateRoute from "./privateroute/PrivateRoute";
 import PublicRoute from "./privateroute/PublicRoute";
-import Dashboard from "./pages/Dashboard/Dashboard"
+import Dashboard from "./pages/Dashboard/Dashboard";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import AgendamentoPage from "./pages/AgendamentoPage/AgendamentoPage";
 import AgendamentoSucesso from "./pages/AgendamentoPage/AgendamentoSucesso";
@@ -13,8 +13,14 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/cadastro" element={<CadastroPage />} />
-      
+      <Route
+        path="/cadastro"
+        element={
+          <PublicRoute>
+            <CadastroPage />
+          </PublicRoute>
+        }
+      />
       {/* Protege a rota /login para não permitir acesso de usuários já autenticados */}
       <Route
         path="/login"
@@ -27,7 +33,7 @@ function App() {
 
       <Route path="/:slug" element={<AgendamentoPage />} />
       <Route path="/agendamento/sucesso" element={<AgendamentoSucesso />} />
-      
+
       <Route
         path="/dashboard"
         element={
