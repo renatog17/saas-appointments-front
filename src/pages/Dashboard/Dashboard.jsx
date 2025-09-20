@@ -16,6 +16,7 @@ import { logout } from "../../services/apiService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Agendamentos from "../../components/Agendamentos";
+import ConfirmacaoEmail from "../../components/ConfirmacaoEmail";
 
 export default function DashBoard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -40,7 +41,9 @@ export default function DashBoard() {
     try {
       setLoading(true);
       const res = await getTenant();
+      console.log(res.data);
       setTenant(res.data);
+      
     } catch (err) {
       console.error("Erro ao carregar tenant:", err);
     } finally {
@@ -64,7 +67,7 @@ export default function DashBoard() {
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
       <aside className="w-64 bg-white shadow-md border-r hidden md:flex flex-col p-6">
-        <h2 className="text-2xl font-bold text-indigo-600 mb-8">ZendaaVip</h2>
+        <h2 className="text-2xl font-bold text-indigo-600 mb-8">ZendaaVip + {}</h2>
         <nav className="space-y-4 mt-4">
           <button
             onClick={() => setActiveTab("dashboard")}
@@ -151,7 +154,10 @@ export default function DashBoard() {
         {/* Conteúdo dinâmico */}
         <main className="p-6 space-y-8 overflow-y-auto flex-1">
           {loading && <p>Carregando...</p>}
-
+          {tenant && !tenant.emailConfirmado && (
+        <ConfirmacaoEmail tenantId={tenant.id}/>
+)}
+            
           {!loading && tenant && activeTab === "dashboard" && (
             <section className="bg-white p-6 rounded-xl shadow">
               <TenantInfo nome={tenant.nome} slug={tenant.slug} srcImg={tenant.img} />

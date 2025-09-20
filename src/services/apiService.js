@@ -32,6 +32,7 @@ export const fazerLogin = (dados) => api.post('/auth/login', dados) //manter ass
 export const getHorariosAgendamentos = (tenantId) => publicApi.get(`agendamento/${tenantId}`)
 export const criarAgendamento = (dados) => publicApi.post('/agendamento', dados)
 export const getTenantPublic = (slug) => publicApi.get(`/tenant/${slug}`)
+export const reenviarCodigoEmail = (loginOrId) => publicApi.post(`/confirmacaoemail`, { loginOrId }) //revisado
 
 //private
 export const arquivarProcedimento = (id) => api.patch(`/procedimento/${id}`)

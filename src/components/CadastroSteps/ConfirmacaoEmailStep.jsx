@@ -1,11 +1,24 @@
 import { useState } from "react";
-import { confirmarEmail } from "../../services/apiService";
+import { confirmarEmail, reenviarCodigoEmail } from "../../services/apiService";
 
 export default function ConfirmacaoEmailStep({ login, onSuccess }) {
   const [codigo, setCodigo] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const reenviarCodigo = async () => {
+    setLoading(true);
+    setMensagem("");
+    try{
+
+      await reenviarCodigoEmail(login);
+    }catch(error){
+      setMensagem("Erro ao reenviar código. Tente novamente.");
+    }finally{
+      setLoading(false);
+    }
+  }
+  
   const handleConfirmar = async () => {
     setLoading(true);
     setMensagem("");
@@ -15,7 +28,7 @@ export default function ConfirmacaoEmailStep({ login, onSuccess }) {
       setMensagem("Email confirmado com sucesso!");
       onSuccess();
     } catch (error) {
-      setMensagem("Código inválido ou erro ao confirmar.");
+      setMensagem("Código inválido ou expirado");
     } finally {
       setLoading(false);
     }
@@ -38,7 +51,15 @@ export default function ConfirmacaoEmailStep({ login, onSuccess }) {
           {mensagem}
         </p>
       )}
-
+<button
+        onClick={reenviarCodigo}
+        disabled={loading}
+        className={`w-full py-3 rounded-xl text-white transition ${
+          loading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+        }`}
+      >
+        {loading ? "Reenviando..." : "Reenviar Código"}
+      </button>
       <button
         onClick={handleConfirmar}
         disabled={loading}

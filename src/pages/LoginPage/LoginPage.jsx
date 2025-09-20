@@ -14,6 +14,7 @@ function LoginPage() {
     e.preventDefault();
     setErro("");
     try {
+      console.log(login)
       const response = await fazerLogin({ login, password });
       console.log(response)
       setAuthenticated(true);
@@ -52,10 +53,20 @@ function LoginPage() {
 
         {/* Botão de Voltar */}
         <button
+          type="button"
           onClick={() => navigate("/")}
           className="mt-4 text-indigo-600 hover:underline"
         >
           Voltar para a página inicial
+        </button>
+        <br></br>
+        {/* Botão para login sem senha */}
+        <button
+          type="button"
+          onClick={() => navigate("/login-sem-senha")}
+          className="mt-2 text-indigo-600 hover:underline"
+        >
+          Esqueceu a senha?
         </button>
       </form>
     </div>
