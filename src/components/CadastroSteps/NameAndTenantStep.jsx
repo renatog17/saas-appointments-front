@@ -35,7 +35,7 @@ export default function NameAndTenantStep({ onNext }) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        Nome e nome da empresa
+        Nome e slug da empresa
       </h2>
 
       <input
@@ -49,7 +49,10 @@ export default function NameAndTenantStep({ onNext }) {
       <input
         type="text"
         value={tenant}
-        onChange={(e) => setTenant(e.target.value)}
+        onChange={(e) => {
+         const cleanValue = e.target.value.replace(/[^a-zA-Z0-9\-]/g, "");
+         setTenant(cleanValue)}
+        }
         placeholder="Nome da empresa (slug)"
         className="w-full border border-gray-300 rounded-xl p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
