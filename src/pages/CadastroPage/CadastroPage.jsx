@@ -99,6 +99,7 @@ function CadastroPage() {
           />
         )}
 
+
         {step === 4 && (
           <ConfirmacaoEmailStep
             login={cadastroData.register.login}

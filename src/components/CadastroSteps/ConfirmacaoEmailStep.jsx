@@ -51,24 +51,28 @@ export default function ConfirmacaoEmailStep({ login, onSuccess }) {
           {mensagem}
         </p>
       )}
-<button
-        onClick={reenviarCodigo}
-        disabled={loading}
-        className={`w-full py-3 rounded-xl text-white transition ${
-          loading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {loading ? "Reenviando..." : "Reenviar Código"}
-      </button>
-      <button
-        onClick={handleConfirmar}
-        disabled={loading}
-        className={`w-full py-3 rounded-xl text-white transition ${
-          loading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {loading ? "Confirmando..." : "Confirmar"}
-      </button>
+      <div className="flex flex-col gap-3">
+        <button
+    onClick={handleConfirmar}
+    disabled={loading}
+    className={`w-full py-3 rounded-xl text-white transition ${
+      loading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+    }`}
+  >
+    {loading ? "Confirmando..." : "Confirmar"}
+  </button>
+  <button
+    onClick={reenviarCodigo}
+    disabled={loading}
+    className={`w-full py-3 rounded-xl text-white transition ${
+      loading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+    }`}
+  >
+    {loading ? "Reenviando..." : "Reenviar Código"}
+  </button>
+
+  
+</div>
     </div>
   );
 }
