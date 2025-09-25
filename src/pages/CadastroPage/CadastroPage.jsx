@@ -5,6 +5,7 @@ import PasswordStep from "../../components/CadastroSteps/PasswordStep";
 import NameAndTenantStep from "../../components/CadastroSteps/NameAndTenantStep";
 import AddProcedureStep from "../../components/CadastroSteps/AddProcedureStep";
 import ConfirmacaoEmailStep from "../../components/CadastroSteps/ConfirmacaoEmailStep";
+import DisponibilidadeStep from "../../components/CadastroSteps/DisponibilidadeStep";
 import CadastroSucessoStep from "../../components/CadastroSteps/CadastroSucessoStep";
 
 function CadastroPage() {
@@ -13,6 +14,7 @@ function CadastroPage() {
     nome: "",
     slug: "",
     procedimentos: [],
+    disponibilidades: [],
     register: {
       login: "",
       password: "",
@@ -20,11 +22,7 @@ function CadastroPage() {
   });
 
   useEffect(() => {
-    console.log("Cadastro atualizado:", cadastroData);
-  }, [cadastroData]);
-
-  useEffect(() => {
-    if (step === 4) {
+    if (step === 5) {
       handleSubmit();
     }
   }, [step]);
@@ -99,15 +97,26 @@ function CadastroPage() {
           />
         )}
 
-
         {step === 4 && (
-          <ConfirmacaoEmailStep
-            login={cadastroData.register.login}
-            onSuccess={() => setStep(5)} 
+          <DisponibilidadeStep
+            onNext={(disponibilidades) => {
+              setCadastroData((prev) => ({
+                ...prev,
+                disponibilidades,
+              }));
+              setStep(5); // Próximo step é ConfirmacaoEmailStep
+            }}
           />
         )}
 
-        {step === 5 && <CadastroSucessoStep />}
+        {step === 5 && (
+          <ConfirmacaoEmailStep
+            login={cadastroData.register.login}
+            onSuccess={() => setStep(6)} 
+          />
+        )}
+
+        {step === 6 && <CadastroSucessoStep />}
 
       </div>
     </div>
