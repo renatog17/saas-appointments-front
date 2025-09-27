@@ -2,23 +2,52 @@ import { useEffect, useState } from "react";
 import { getHorariosAgendamentos } from "../../services/apiService";
 import Calendar from "react-calendar";
 import "./SelecionarDataEHorario.css";
+import { useMemo } from "react";
 
-export default function SelecionarDataEHorario({ tenantId, onSelecionar }) {
+export default function SelecionarDataEHorario({
+  tenantId,
+  onSelecionar,
+  disponibilidadeSemanal,
+}) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [agendamentos, setAgendamentos] = useState({});
   const [selectedTime, setSelectedTime] = useState(null);
 
-  const HORARIOS_POSIVEIS = [
-    "08:00",
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-  ];
+  const diasPermitidos = useMemo(() => {
+    return new Set((disponibilidadeSemanal || []).map((d) => d.diaDaSemana));
+  }, [disponibilidadeSemanal]);
+
+  // Pegamos o dia da semana do selectedDate
+  const diaSemanaSelecionado = selectedDate.getDay();
+
+  // Buscamos no JSON a disponibilidade desse dia
+  const horariosDoDia = disponibilidadeSemanal.find(
+    (d) => d.diaDaSemana === diaSemanaSelecionado
+  );
+
+  // horariosDoDia terá algo como { id, diaDaSemana, inicio, fim } ou undefined
+
+  const gerarHorarios = (inicio, fim) => {
+    const horarios = [];
+    const [horaInicio, minInicio] = inicio.split(":").map(Number);
+    const [horaFim, minFim] = fim.split(":").map(Number);
+
+    let hora = horaInicio;
+    let minuto = minInicio;
+
+    while (hora < horaFim || (hora === horaFim && minuto < minFim)) {
+      horarios.push(
+        `${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`
+      );
+      hora += 1; // intervalo de 1 hora
+    }
+
+    return horarios;
+  };
+
+  const horariosDisponiveis = horariosDoDia
+    ? gerarHorarios(horariosDoDia.inicio, horariosDoDia.fim)
+    : [];
 
   useEffect(() => {
     const fetchAgendamentos = async () => {
@@ -33,25 +62,22 @@ export default function SelecionarDataEHorario({ tenantId, onSelecionar }) {
     fetchAgendamentos();
   }, [tenantId]);
 
-  const getDateKey = (date) => date.toISOString().split("T")[0];
+  useEffect(() => {
+    if (selectedTime) {
+      // selectedTime é "HH:mm"
+      const [hora, minuto] = selectedTime.split(":").map(Number);
+      const dateTimeCompleto = new Date(selectedDate);
+      dateTimeCompleto.setHours(hora, minuto, 0, 0);
+      // Remove o deslocamento local (gambiarra provisória permanente)
+      const corrigido = new Date(
+        dateTimeCompleto.getTime() -
+          dateTimeCompleto.getTimezoneOffset() * 60000
+      );
 
-  const horariosIndisponiveis = (
-    agendamentos[getDateKey(selectedDate)] || []
-  ).map((hora) => hora.slice(0, 5));
-
-  const horariosDisponiveis = HORARIOS_POSIVEIS.filter(
-    (hora) => !horariosIndisponiveis.includes(hora)
-  );
-
-  const handleSelectTime = (hora) => {
-  setSelectedTime(hora);
-  if (onSelecionar) {
-    const dataStr = getDateKey(selectedDate); // YYYY-MM-DD
-    const horarioCompleto = `${dataStr}T${hora}:00`;
-    onSelecionar(horarioCompleto);
-  }
-};
-
+      console.log(corrigido.toISOString())
+      onSelecionar(corrigido.toISOString())
+    }
+  }, [selectedDate, selectedTime, onSelecionar]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
@@ -63,41 +89,34 @@ export default function SelecionarDataEHorario({ tenantId, onSelecionar }) {
           value={selectedDate}
           minDate={new Date()}
           className="rounded-xl shadow-lg p-4 bg-white"
+          tileDisabled={({ date, view }) => {
+            if (view === "month") {
+              const diaSemana = date.getDay(); // 0 = domingo, 6 = sábado
+              return !diasPermitidos.has(diaSemana);
+            }
+            return false;
+          }}
         />
-
-        <div className="mt-6 w-full">
-          <h2 className="text-lg font-semibold mb-2 text-center">
-            {selectedDate.toDateString()}
-          </h2>
-
+        <div className="mt-4 w-full max-w-md">
+          <h2 className="text-lg font-semibold mb-2">Horários disponíveis:</h2>
           {horariosDisponiveis.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
-              {HORARIOS_POSIVEIS.map((hora) => {
-                const isIndisponivel = horariosIndisponiveis.includes(hora);
-                return (
-                  <button
-                    key={hora}
-                    disabled={isIndisponivel}
-                    onClick={() => handleSelectTime(hora)}
-                    className={`px-4 py-2 rounded border transition
-                      ${
-                        isIndisponivel
-                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                          : hora === selectedTime
-                          ? "bg-blue-600 text-white cursor-pointer"
-                          : "border-blue-500 text-blue-500 hover:bg-blue-100 cursor-pointer"
-                      }
-                    `}
-                  >
-                    {hora}
-                  </button>
-                );
-              })}
+            <div className="grid grid-cols-3 gap-2">
+              {horariosDisponiveis.map((hora) => (
+                <button
+                  key={hora}
+                  className={`p-2 rounded-xl border ${
+                    selectedTime === hora
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                  onClick={() => setSelectedTime(hora)}
+                >
+                  {hora}
+                </button>
+              ))}
             </div>
           ) : (
-            <p className="text-center text-gray-500 mt-2">
-              Nenhum horário disponível.
-            </p>
+            <p>Não há horários disponíveis neste dia.</p>
           )}
         </div>
       </div>

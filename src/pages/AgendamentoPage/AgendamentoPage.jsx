@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  getHorariosAgendamentos,
   getTenantPublic,
   criarAgendamento,
   BASE_URL,
@@ -25,6 +24,7 @@ const AgendamentoPage = () => {
     const fetchTenant = async () => {
       try {
         const response = await getTenantPublic(slug);
+        console.log(response.data);
         setTenant(response.data);
       } catch (erro) {
         console.error(erro);
@@ -53,9 +53,6 @@ const AgendamentoPage = () => {
         tenantId: tenant.id,
         nome
       });
-      console.log(horarioSelecionado);
-      setMensagem("Agendamento realizado com sucesso!");
-      // Resetar os dados, se quiser
       setProcedimentoSelecionado(null);
       setHorarioSelecionado(null);
       setEmail("");
@@ -113,6 +110,7 @@ const AgendamentoPage = () => {
             <div className="bg-white rounded-xl shadow-md p-6">
               <SelecionarDataEHorario
                 tenantId={tenant.id}
+                disponibilidadeSemanal={tenant.disponibilidades}
                 onSelecionar={(horarioCompleto) =>
                   setHorarioSelecionado(horarioCompleto)
                 }
