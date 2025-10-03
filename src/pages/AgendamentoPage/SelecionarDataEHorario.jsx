@@ -9,23 +9,20 @@ export default function SelecionarDataEHorario({
   onSelecionar,
   disponibilidadeSemanal,
 }) {
+  
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [agendamentos, setAgendamentos] = useState({});
+  const [agendamentos, setAgendamentos] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
 
   const diasPermitidos = useMemo(() => {
     return new Set((disponibilidadeSemanal || []).map((d) => d.diaDaSemana));
   }, [disponibilidadeSemanal]);
 
-  // Pegamos o dia da semana do selectedDate
   const diaSemanaSelecionado = selectedDate.getDay();
 
-  // Buscamos no JSON a disponibilidade desse dia
-  const horariosDoDia = disponibilidadeSemanal.find(
+  const horariosDoDia = disponibilidadeSemanal.filter(
     (d) => d.diaDaSemana === diaSemanaSelecionado
   );
-
-  // horariosDoDia terá algo como { id, diaDaSemana, inicio, fim } ou undefined
 
   const gerarHorarios = (inicio, fim) => {
     const horarios = [];
@@ -45,15 +42,31 @@ export default function SelecionarDataEHorario({
     return horarios;
   };
 
-  const horariosDisponiveis = horariosDoDia
-    ? gerarHorarios(horariosDoDia.inicio, horariosDoDia.fim)
+  // Geramos todos os horários para cada intervalo
+const horariosDisponiveis =
+  horariosDoDia.length > 0
+    ? horariosDoDia
+        .flatMap((d) => gerarHorarios(d.inicio, d.fim))
+        .filter((hora) => {
+          // Filtra os horários que já não estão agendados
+          const dateStr = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+          return !agendamentos.some((a) => {
+            const aDate = new Date(a.dateTime);
+            const aDateStr = aDate.toISOString().split("T")[0];
+            const aHour = String(aDate.getHours()).padStart(2, "0") + ":00"; // assume intervalo de 1h
+            return dateStr === aDateStr && hora === aHour;
+          });
+        })
     : [];
+
 
   useEffect(() => {
     const fetchAgendamentos = async () => {
       try {
         const response = await getHorariosAgendamentos(tenantId);
+        console.log(response.data)
         setAgendamentos(response.data);
+
       } catch (erro) {
         console.error(erro);
       }
@@ -73,9 +86,7 @@ export default function SelecionarDataEHorario({
         dateTimeCompleto.getTime() -
           dateTimeCompleto.getTimezoneOffset() * 60000
       );
-
-      console.log(corrigido.toISOString())
-      onSelecionar(corrigido.toISOString())
+      onSelecionar(corrigido.toISOString());
     }
   }, [selectedDate, selectedTime, onSelecionar]);
 
@@ -85,18 +96,28 @@ export default function SelecionarDataEHorario({
 
       <div className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center w-full max-w-md">
         <Calendar
-          onChange={setSelectedDate}
-          value={selectedDate}
-          minDate={new Date()}
-          className="rounded-xl shadow-lg p-4 bg-white"
-          tileDisabled={({ date, view }) => {
-            if (view === "month") {
-              const diaSemana = date.getDay(); // 0 = domingo, 6 = sábado
-              return !diasPermitidos.has(diaSemana);
-            }
-            return false;
-          }}
-        />
+  onChange={setSelectedDate}
+  value={selectedDate}
+  minDate={new Date()}
+  className="rounded-xl shadow-lg p-4 bg-white"
+  tileDisabled={({ date, view }) => {
+    if (view === "month") {
+      const diaSemana = date.getDay();
+      return !diasPermitidos.has(diaSemana);
+    }
+    return false;
+  }}
+  tileClassName={({ date, view }) => {
+    if (view === "month") {
+      const diaSemana = date.getDay();
+      if (!diasPermitidos.has(diaSemana)) {
+        return "dia-indisponivel"; // classe custom
+      }
+    }
+    return "";
+  }}
+/>
+
         <div className="mt-4 w-full max-w-md">
           <h2 className="text-lg font-semibold mb-2">Horários disponíveis:</h2>
           {horariosDisponiveis.length > 0 ? (

@@ -24,7 +24,6 @@ const AgendamentoPage = () => {
     const fetchTenant = async () => {
       try {
         const response = await getTenantPublic(slug);
-        console.log(response.data);
         setTenant(response.data);
       } catch (erro) {
         console.error(erro);
@@ -155,6 +154,10 @@ const AgendamentoPage = () => {
               )}
             </div>
           </div>
+          {/* Rodapé */}
+          <footer className="bg-gray-200 text-gray-700 text-center py-4 mt-6">
+            © {new Date().getFullYear()} ZendaaVip. Todos os direitos reservados.
+          </footer>
         </>
       ) : (
         <div className="flex justify-center items-center min-h-screen">

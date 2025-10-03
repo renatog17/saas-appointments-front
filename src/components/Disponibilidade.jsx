@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { atualizarDisponibilidade } from "../services/apiService";
 
 const diasDaSemana = [
   { label: "Domingo", value: 0 },
@@ -15,9 +16,23 @@ const horas = Array.from({ length: 24 }, (_, i) => {
   return `${h}:00`;
 });
 
-export default function DisponibilidadeStep({ onNext }) {
+export default function Disponibilidade({ lista }) {
   const [diasSelecionados, setDiasSelecionados] = useState({});
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (lista) {
+      const inicial = {};
+      lista.forEach(({ diaDaSemana, inicio, fim }) => {
+        if (!inicial[diaDaSemana]) inicial[diaDaSemana] = [];
+        // remove os segundos
+        const inicioFormatado = inicio.slice(0, 5);
+        const fimFormatado = fim.slice(0, 5);
+        inicial[diaDaSemana].push({ inicio: inicioFormatado, fim: fimFormatado });
+      });
+      setDiasSelecionados(inicial);
+    }
+  }, [lista]);
 
   /** Marca/desmarca um dia */
   function toggleDia(dia) {
@@ -65,7 +80,9 @@ export default function DisponibilidadeStep({ onNext }) {
    * Retorna TRUE se houver conflito
    */
   function hasOverlap(intervalos) {
-    const sorted = [...intervalos].sort((a, b) => a.inicio.localeCompare(b.inicio));
+    const sorted = [...intervalos].sort((a, b) =>
+      a.inicio.localeCompare(b.inicio)
+    );
     for (let i = 0; i < sorted.length - 1; i++) {
       if (sorted[i].fim > sorted[i + 1].inicio) {
         return true; // sobreposição detectada
@@ -74,7 +91,6 @@ export default function DisponibilidadeStep({ onNext }) {
     return false;
   }
 
-  /** Finaliza cadastro */
   function handleFinish() {
     setError(null);
 
@@ -107,15 +123,20 @@ export default function DisponibilidadeStep({ onNext }) {
           fim: intervalo.fim,
         });
       });
-    }
 
+    }
+    
     if (diasFinal.length === 0) {
       setError("Selecione pelo menos um dia e defina os horários.");
       return;
     }
+    atualizarDisponibilidade(diasFinal).then(() => {
+      
+    }).catch(() => {
+      setError("Erro ao atualizar disponibilidades. Tente novamente.");
+    });
 
     console.log(diasFinal);
-    onNext(diasFinal);
   }
 
   return (
@@ -154,7 +175,12 @@ export default function DisponibilidadeStep({ onNext }) {
                     <select
                       value={intervalo.inicio}
                       onChange={(e) =>
-                        updateHorarioDia(dia.value, index, "inicio", e.target.value)
+                        updateHorarioDia(
+                          dia.value,
+                          index,
+                          "inicio",
+                          e.target.value
+                        )
                       }
                       className="border border-gray-300 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
@@ -169,7 +195,12 @@ export default function DisponibilidadeStep({ onNext }) {
                     <select
                       value={intervalo.fim}
                       onChange={(e) =>
-                        updateHorarioDia(dia.value, index, "fim", e.target.value)
+                        updateHorarioDia(
+                          dia.value,
+                          index,
+                          "fim",
+                          e.target.value
+                        )
                       }
                       className="border border-gray-300 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >

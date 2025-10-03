@@ -72,3 +72,10 @@
 .react-calendar__navigation__next2-button {
   display: none;
 }
+
+.dia-indisponivel {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
