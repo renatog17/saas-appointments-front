@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import AgendamentoPage from "./pages/AgendamentoPage/AgendamentoPage";
 import AgendamentoSucesso from "./pages/AgendamentoPage/AgendamentoSucesso";
+import ForgetPasswordPage from "./pages/ForgetPasswordPage/ForgetPasswordPage";
 
 function App() {
   return (
@@ -29,6 +30,12 @@ function App() {
             <LoginPage />
           </PublicRoute>
         }
+      />
+      <Route
+        path="/forgetpassword"
+        element={<PublicRoute>
+          <ForgetPasswordPage />
+        </PublicRoute>}
       />
 
       <Route path="/:slug" element={<AgendamentoPage />} />

@@ -13,7 +13,6 @@ import {
 import { getTenant } from "../../services/apiService";
 import { useEffect } from "react";
 import ProcedimentoForm from "../../components/ProcedimentoForm";
-import { logout } from "../../services/apiService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Agendamentos from "../../components/Agendamentos";

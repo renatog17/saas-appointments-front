@@ -24,16 +24,18 @@ export const publicApi = axios.create({
 //auth
 export const postTenant = (dados) => publicApi.post('/tenant', dados) //revisado
 export const existTenantBySlug = (slug) => publicApi.get(`/tenant/slug/${slug}`) //revisado
-export const confirmarEmail = (dados) => publicApi.post(`/auth/confirmaremail`, dados) //revisado
 export const existUserByEmail = (email) => publicApi.get(`auth/${email}`) //revisado
 export const fazerLogin = (dados) => api.post('/auth/login', dados) //manter assim por enquanto. está dando conflito com o nome de uma variável interna do component de realizar login
-
+//confirmacao email
+export const confirmarEmail = (dados) => publicApi.post(`confirmaremail`, dados) //revisado
+export const reenviarCodigoEmail = (loginOrId) => publicApi.post(`/confirmaremail/reenviarcodigo`, { loginOrId })
 //public
 export const getHorariosAgendamentos = (tenantId) => publicApi.get(`agendamento/${tenantId}`)
 export const criarAgendamento = (dados) => publicApi.post('/agendamento', dados)
 export const getTenantPublic = (slug) => publicApi.get(`/tenant/${slug}`)
-export const reenviarCodigoEmail = (loginOrId) => publicApi.post(`/confirmacaoemail`, { loginOrId }) //revisado
 
+export const enviarCodigoRecuperacao = (dados) => publicApi.post('/login-code/gerarcodigo', dados) 
+export const confirmarLogin = (dados) => api.post(`/login-code`, dados)
 //private
 export const excluirProcedimento = (id) => api.delete(`/procedimento/${id}`)
 export const criarProcedimentos = (procedimentos) => api.post('/procedimento', procedimentos)

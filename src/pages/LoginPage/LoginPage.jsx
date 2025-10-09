@@ -14,9 +14,7 @@ function LoginPage() {
     e.preventDefault();
     setErro("");
     try {
-      console.log(login)
-      const response = await fazerLogin({ login, password });
-      console.log(response)
+      await fazerLogin({ login, password });
       setAuthenticated(true);
       navigate("/dashboard");
     } catch (err) {
@@ -63,7 +61,15 @@ function LoginPage() {
         {/* Botão para login sem senha */}
         <button
           type="button"
-          onClick={() => navigate("/login-sem-senha")}
+          onClick={() => {
+            if (!login.trim()) {
+              setErro("Por favor, insira seu email para redefinir a senha.");
+              return;
+            } else {
+              navigate("/forgetpassword", { state: { email: login } });
+              setErro("");
+            }
+          }}
           className="mt-2 text-indigo-600 hover:underline"
         >
           Esqueceu a senha?
