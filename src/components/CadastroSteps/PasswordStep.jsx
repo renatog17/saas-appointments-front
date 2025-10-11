@@ -11,26 +11,6 @@ export default function PasswordStep({ onNext }) {
       return;
     }
 
-    if (!/[A-Z]/.test(password)) {
-      setError("A senha deve conter pelo menos uma letra maiúscula.");
-      return;
-    }
-
-    if (!/[a-z]/.test(password)) {
-      setError("A senha deve conter pelo menos uma letra minúscula.");
-      return;
-    }
-
-    if (!/[0-9]/.test(password)) {
-      setError("A senha deve conter pelo menos um número.");
-      return;
-    }
-
-    if (!/[^A-Za-z0-9]/.test(password)) {
-      setError("A senha deve conter pelo menos um caractere especial.");
-      return;
-    }
-
     setError(null);
     onNext(password);
   }

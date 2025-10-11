@@ -40,7 +40,6 @@ export default function DashBoard() {
     try {
       setLoading(true);
       const res = await getTenant();
-      console.log(res.data);
       setTenant(res.data);
     } catch (err) {
       console.error("Erro ao carregar tenant:", err);

@@ -37,6 +37,7 @@ export const getTenantPublic = (slug) => publicApi.get(`/tenant/${slug}`)
 export const enviarCodigoRecuperacao = (dados) => publicApi.post('/login-code/gerarcodigo', dados) 
 export const confirmarLogin = (dados) => api.post(`/login-code`, dados)
 //private
+export const editarProcedimento = (id, dados) => api.put(`/procedimento/${id}`, dados)
 export const excluirProcedimento = (id) => api.delete(`/procedimento/${id}`)
 export const criarProcedimentos = (procedimentos) => api.post('/procedimento', procedimentos)
 export const atualizarDisponibilidade = (disponibilidades) => api.post('/disponibilidade', disponibilidades)

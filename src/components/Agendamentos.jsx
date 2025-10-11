@@ -88,12 +88,12 @@ export default function Agendamentos({ tenantId }) {
                       minute: "2-digit",
                     })}
                     <br />
-                    <strong>Procedimento:</strong> {agendamento.procedimento.nome} (
-                    {agendamento.procedimento.descricao}) - R$
+                    <strong>Procedimento:</strong> {agendamento.procedimento.nome} - R$
                     {agendamento.procedimento.valor.toFixed(2)}
                     <br />
-                    <strong>Consumidor:</strong> {agendamento.consumidor.nome} (
-                    {agendamento.consumidor.telefone})
+                    <strong>Consumidor:</strong> {agendamento.consumidor.nome} 
+                    <br />
+                    <strong>Telefone:</strong> {agendamento.consumidor.telefone}
                     <br />
                     <strong>Email:</strong> {agendamento.consumidor.email}
                   </li>

@@ -43,16 +43,28 @@ export default function TenantInfo({ nome, slug, srcImg }) {
           />
         ) : (
           <div
-            className="w-20 h-20 rounded-full bg-indigo-600 flex items-center justify-center border-2 border-gray-300 text-white text-3xl font-bold cursor-pointer select-none"
+            className="w-20 h-20 rounded-full bg-gray-100 flex flex-col items-center justify-center border-2 border-dashed border-gray-400 text-gray-500 text-center text-xs cursor-pointer select-none p-2 hover:bg-gray-200 transition"
             onClick={handleImageClick}
           >
-            {getInitials(nome)}
+            <span className="font-medium">Clique aqui</span>
+            <span>para adicionar</span>
+            <span>uma imagem</span>
           </div>
         )}
-
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{nome}</h1>
-          <p className="text-indigo-600 text-lg">@{slug}</p>
+          <p className="text-gray-700 text-lg mt-2">
+            Seus clientes poderão agendar procedimentos através do link:{" "}
+            <br></br>
+            <a
+              href={`https://zendaavip.com.br/${slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-600 hover:text-indigo-800 font-medium"
+            >
+              zendaavip.com.br/{slug}
+            </a>
+          </p>
         </div>
       </div>
 

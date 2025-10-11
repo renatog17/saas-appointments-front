@@ -16,6 +16,7 @@ const AgendamentoPage = () => {
   const [horarioSelecionado, setHorarioSelecionado] = useState(null);
   const [email, setEmail] = useState("");
   const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [erro404, setErro404] = useState(false);
@@ -36,7 +37,7 @@ const AgendamentoPage = () => {
     fetchTenant();
   }, [slug]);
 
-  const podeAgendar = procedimentoSelecionado && horarioSelecionado && email;
+  const podeAgendar = nome && procedimentoSelecionado && horarioSelecionado && email;
 
   const handleAgendar = async () => {
     if (!podeAgendar) return;
@@ -45,16 +46,20 @@ const AgendamentoPage = () => {
     setMensagem("");
 
     try {
+
       await criarAgendamento({
         procedimentoId: procedimentoSelecionado,
         dateTime: horarioSelecionado,
         email,
+        telefone,
         tenantId: tenant.id,
         nome
       });
       setProcedimentoSelecionado(null);
       setHorarioSelecionado(null);
       setEmail("");
+      setTelefone("");
+      setNome("");
       navigate("/agendamento/sucesso");
     } catch (erro) {
       setMensagem("Erro ao agendar. Tente novamente.");
@@ -124,7 +129,7 @@ const AgendamentoPage = () => {
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
               />
-              <label className="block text-gray-700 mb-2">Seu e-mail:</label>
+              <label className="block text-gray-700 mb-2">E-mail:</label>
               <input
                 type="email"
                 className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -132,6 +137,15 @@ const AgendamentoPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="voce@email.com"
               />
+              <label className="block text-gray-700 mb-2">Telefone/Whatsapp:</label>
+              <input
+                type="tel"
+                className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+                placeholder="(99) 99999-9999"
+              />
+            
             </div>
 
             <div className="text-center">
