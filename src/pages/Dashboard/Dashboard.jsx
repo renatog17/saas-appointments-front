@@ -9,6 +9,8 @@ import {
   ChevronDown,
   LogOut,
   User,
+  Menu,
+  X,
 } from "lucide-react";
 import { getTenant } from "../../services/apiService";
 import { useEffect } from "react";
@@ -21,6 +23,7 @@ import ConfirmacaoEmail from "../../components/ConfirmacaoEmail";
 export default function DashBoard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuRef = useRef(null);
   const [tenant, setTenant] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +54,7 @@ export default function DashBoard() {
   useEffect(() => {
     carregarTenant();
   }, []);
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -60,62 +64,99 @@ export default function DashBoard() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+ const SidebarContent = (
+    <>
+      <h2 className="text-2xl font-bold text-indigo-600 mb-8">
+        ZendaaVip
+      </h2>
+      <nav className="space-y-4 mt-4">
+        <button
+          onClick={() => {
+            setActiveTab("dashboard");
+            setSidebarOpen(false);
+          }}
+          className={`flex items-center gap-2 text-left w-full px-2 py-1 rounded ${
+            activeTab === "dashboard"
+              ? "text-indigo-600 font-semibold"
+              : "text-gray-700 hover:text-indigo-600"
+          } transition`}
+        >
+          <LayoutDashboard size={18} /> Dashboard
+        </button>
+
+        <button
+          onClick={() => {
+            setActiveTab("procedimentos");
+            setSidebarOpen(false);
+          }}
+          className={`flex items-center gap-2 text-left w-full px-2 py-1 rounded ${
+            activeTab === "procedimentos"
+              ? "text-indigo-600 font-semibold"
+              : "text-gray-700 hover:text-indigo-600"
+          } transition`}
+        >
+          <ListOrdered size={18} /> Procedimentos
+        </button>
+
+        <button
+          onClick={() => {
+            setActiveTab("config");
+            setSidebarOpen(false);
+          }}
+          className={`flex items-center gap-2 text-left w-full px-2 py-1 rounded ${
+            activeTab === "config"
+              ? "text-indigo-600 font-semibold"
+              : "text-gray-700 hover:text-indigo-600"
+          } transition`}
+        >
+          <Settings size={18} /> Disponibilidades
+        </button>
+      </nav>
+    </>
+  );
+
   return (
     <div className="min-h-screen flex bg-gray-100">
-      {/* Sidebar */}
+      {/* Sidebar (desktop) */}
       <aside className="w-64 bg-white shadow-md border-r hidden md:flex flex-col p-6">
-        <h2 className="text-2xl font-bold text-indigo-600 mb-8">
-          ZendaaVip + {}
-        </h2>
-        <nav className="space-y-4 mt-4">
-          <button
-            onClick={() => setActiveTab("dashboard")}
-            className={`flex items-center gap-2 text-left w-full px-2 py-1 rounded 
-              ${
-                activeTab === "dashboard"
-                  ? "text-indigo-600 font-semibold"
-                  : "text-gray-700 hover:text-indigo-600"
-              }
-              transition`}
-          >
-            <LayoutDashboard size={18} /> Dashboard
-          </button>
-
-          <button
-            onClick={() => setActiveTab("procedimentos")}
-            className={`flex items-center gap-2 text-left w-full px-2 py-1 rounded 
-              ${
-                activeTab === "procedimentos"
-                  ? "text-indigo-600 font-semibold"
-                  : "text-gray-700 hover:text-indigo-600"
-              }
-              transition`}
-          >
-            <ListOrdered size={18} /> Procedimentos
-          </button>
-
-          <button
-            onClick={() => setActiveTab("config")}
-            className={`flex items-center gap-2 text-left w-full px-2 py-1 rounded 
-              ${
-                activeTab === "config"
-                  ? "text-indigo-600 font-semibold"
-                  : "text-gray-700 hover:text-indigo-600"
-              }
-              transition`}
-          >
-            <Settings size={18} /> Disponibilidades
-          </button>
-        </nav>
+        {SidebarContent}
       </aside>
+
+      {/* Sidebar (mobile overlay) */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden" onClick={() => setSidebarOpen(false)}>
+          <div
+            className="absolute top-0 left-0 w-64 h-full bg-white p-6 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <X size={22} />
+            </button>
+            {SidebarContent}
+          </div>
+        </div>
+      )}
 
       {/* Conteúdo principal */}
       <div className="flex-1 flex flex-col">
         {/* Top Header */}
         <div className="bg-white shadow px-6 py-4 flex justify-between items-center relative">
-          <h1 className="text-xl font-semibold text-gray-800 capitalize">
-            {activeTab}
-          </h1>
+          <div className="flex items-center gap-3">
+            {/* Botão de menu (mobile) */}
+            <button
+              className="md:hidden text-gray-700 hover:text-indigo-600"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu size={22} />
+            </button>
+            <h1 className="text-xl font-semibold text-gray-800 capitalize">
+              {activeTab}
+            </h1>
+          </div>
 
           {/* Dropdown Menu */}
           <div className="relative" ref={menuRef}>
@@ -159,12 +200,8 @@ export default function DashBoard() {
 
           {!loading && tenant && activeTab === "dashboard" && (
             <section className="bg-white p-6 rounded-xl shadow">
-              <TenantInfo
-                nome={tenant.nome}
-                slug={tenant.slug}
-                srcImg={tenant.img}
-              />
-              <Agendamentos tenantId={tenant.id}></Agendamentos>
+              <TenantInfo nome={tenant.nome} slug={tenant.slug} srcImg={tenant.img} />
+              <Agendamentos tenantId={tenant.id} />
             </section>
           )}
 
@@ -175,11 +212,9 @@ export default function DashBoard() {
             </section>
           )}
 
-          {activeTab === "config" && (
+          {tenant && activeTab === "config" && (
             <section className="bg-white p-6 rounded-xl shadow text-gray-600">
-              
               <Disponibilidade lista={tenant.disponibilidades} />
-              
             </section>
           )}
         </main>
