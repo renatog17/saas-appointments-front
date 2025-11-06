@@ -6,15 +6,9 @@ export default function TenantInfo({ nome, slug, srcImg }) {
   const [imgError, setImgError] = useState(false);
   const [imgSrc, setImgSrc] = useState(srcImg);
   const [modalOpen, setModalOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
-  const getInitials = (name) => {
-    if (!name) return "";
-    const words = name.trim().split(" ");
-    if (words.length === 1) {
-      return words[0].slice(0, 2).toUpperCase();
-    }
-    return (words[0][0] + words[1][0]).toUpperCase();
-  };
+ 
 
   const handleImageClick = () => {
     setModalOpen(true);
@@ -26,6 +20,7 @@ export default function TenantInfo({ nome, slug, srcImg }) {
 
   const handleSaveImage = (file) => {
     const url = URL.createObjectURL(file);
+    setPreviewUrl(url); // usa apenas para preview
     setImgSrc(url);
     setImgError(false);
   };
@@ -35,7 +30,7 @@ export default function TenantInfo({ nome, slug, srcImg }) {
       <div className="flex items-center space-x-6">
         {!imgError && imgSrc ? (
           <img
-            src={`${BASE_URL}/uploads/${imgSrc}`}
+            src={previewUrl ? previewUrl : `${BASE_URL}/uploads/${imgSrc}`}
             alt={`Logo de ${nome}`}
             className="w-20 h-20 rounded-full object-cover border-2 border-gray-300 cursor-pointer"
             onError={() => setImgError(true)}

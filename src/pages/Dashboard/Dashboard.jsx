@@ -169,7 +169,7 @@ export default function DashBoard() {
 
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-44 bg-white border rounded shadow-lg z-50">
-                <button
+               {/* <button
                   onClick={() => {
                     navigate("/editar-perfil");
                     setMenuOpen(false);
@@ -179,6 +179,7 @@ export default function DashBoard() {
                   <User size={16} />
                   Editar Perfil
                 </button>
+                */}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
