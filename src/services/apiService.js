@@ -45,13 +45,36 @@ export const criarTenant = (tenant) => api.post('/tenant', tenant)
 export const getTenant = () => api.get('/tenant')
 export const checkLogin = () => api.get('/auth/check')
 export const logout = () => api.post('/auth/logout');
-
+export const cancelarAgendamento = (tenantId) => api.delete(`/agendamento/${tenantId}`)
 
 export const uploadImagemTenant = (file) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  return api.post("/image/tenant", formData, {
+  return api.post("/image/profile", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+export const uploadImagemTenantCover = (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return api.post("/image/cover", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+
+export const uploadImagemProcedimento = (file, id) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return api.post(`/image/procedimento/${id}`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

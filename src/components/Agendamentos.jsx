@@ -1,4 +1,7 @@
-import { getHorariosAgendamentos } from "../services/apiService";
+import {
+  getHorariosAgendamentos,
+  cancelarAgendamento,
+} from "../services/apiService";
 import { useState, useEffect } from "react";
 
 export default function Agendamentos({ tenantId }) {
@@ -12,24 +15,22 @@ export default function Agendamentos({ tenantId }) {
     const fetchAgendamentos = async () => {
       try {
         const response = await getHorariosAgendamentos(tenantId);
-        console.log("Agendamentos:", response.data);
 
-        // Agrupa por data e ordena por hora
-        const agendamentosOrganizados = response.data.reduce((acc, agendamento) => {
-          const data = agendamento.dateTime.split("T")[0]; // só a data
+        const agendamentosOrganizados = response.data.reduce(
+          (acc, agendamento) => {
+            const data = agendamento.dateTime.split("T")[0];
 
-          if (!acc[data]) {
-            acc[data] = [];
-          }
+            if (!acc[data]) acc[data] = [];
+            acc[data].push(agendamento);
 
-          acc[data].push(agendamento);
-          return acc;
-        }, {});
+            return acc;
+          },
+          {}
+        );
 
-        // Agora ordena os agendamentos de cada dia por horário
         Object.keys(agendamentosOrganizados).forEach((data) => {
-          agendamentosOrganizados[data].sort((a, b) =>
-            new Date(a.dateTime) - new Date(b.dateTime)
+          agendamentosOrganizados[data].sort(
+            (a, b) => new Date(a.dateTime) - new Date(b.dateTime)
           );
         });
 
@@ -44,10 +45,38 @@ export default function Agendamentos({ tenantId }) {
     fetchAgendamentos();
   }, [tenantId]);
 
+  // ✅ cancelar agendamento
+  async function handleCancelar(id, data) {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja cancelar este agendamento?"
+    );
+    if (!confirmar) return;
+
+    try {
+      await cancelarAgendamento(id); // ✅ seu método, sem retorno
+
+      // ✅ remover visualmente da lista (sem reload)
+      setAgendamentos((prev) => {
+        const copia = { ...prev };
+        copia[data] = copia[data].filter((item) => item.id !== id);
+
+        // remove dia vazio
+        if (copia[data].length === 0) delete copia[data];
+
+        return copia;
+      });
+    } catch (err) {
+      console.error("Erro ao cancelar agendamento:", err);
+      alert("Erro ao cancelar agendamento.");
+    }
+  }
+
   return (
     <>
       {loading ? (
-        <p style={{ fontStyle: "italic", color: "#555" }}>Carregando horários...</p>
+        <p style={{ fontStyle: "italic", color: "#555" }}>
+          Carregando horários...
+        </p>
       ) : (
         <div
           style={{
@@ -71,6 +100,7 @@ export default function Agendamentos({ tenantId }) {
               }}
             >
               <h4 style={{ margin: "0 0 0.5rem", color: "#0077cc" }}>{data}</h4>
+
               <ul style={{ listStyle: "none", paddingLeft: 0 }}>
                 {listaAgendamentos.map((agendamento) => (
                   <li
@@ -80,22 +110,47 @@ export default function Agendamentos({ tenantId }) {
                       padding: "0.6rem",
                       borderRadius: "4px",
                       marginBottom: "0.5rem",
+                      position: "relative", // ✅ ESSENCIAL
+                      paddingBottom: "2.2rem", // ✅ cria espaço para o botão
                     }}
                   >
                     <strong>Hora:</strong>{" "}
-                    {new Date(agendamento.dateTime).toLocaleTimeString("pt-BR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {new Date(agendamento.dateTime).toLocaleTimeString(
+                      "pt-BR",
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
                     <br />
-                    <strong>Procedimento:</strong> {agendamento.procedimento.nome} - R$
+                    <strong>Procedimento:</strong>{" "}
+                    {agendamento.procedimento.nome} - R$
                     {agendamento.procedimento.valor.toFixed(2)}
                     <br />
-                    <strong>Consumidor:</strong> {agendamento.consumidor.nome} 
+                    <strong>Consumidor:</strong> {agendamento.consumidor.nome}
                     <br />
                     <strong>Telefone:</strong> {agendamento.consumidor.telefone}
                     <br />
                     <strong>Email:</strong> {agendamento.consumidor.email}
+                    {/* ✅ Botão no canto inferior direito */}
+                    <button
+                      onClick={() => handleCancelar(agendamento.id, data)}
+                      style={{
+                        position: "absolute",
+                        bottom: "6px",
+                        right: "6px",
+                        padding: "6px 10px",
+                        backgroundColor: "#ff4d4d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "0.80rem",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
+                      }}
+                    >
+                      Cancelar
+                    </button>
                   </li>
                 ))}
               </ul>

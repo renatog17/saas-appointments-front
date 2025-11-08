@@ -5,8 +5,11 @@ import {
   criarAgendamento,
   BASE_URL,
 } from "../../services/apiService";
-import SelecionarDataEHorario from "./SelecionarDataEHorario";
-import SelecionarProcedimento from "./SeleceionarProcedimento";
+import BlocoDataEHorario from "./BlocoDataEHorario";
+import BlocoProcedimento from "./BlocoProcedimento";
+import BlocoContato from "./BlocoContato";
+import HeaderTenant from "./HeaderTenant";
+import ContainerEtapa from "./ContainerEtapa";
 
 const AgendamentoPage = () => {
   const navigate = useNavigate();
@@ -20,6 +23,7 @@ const AgendamentoPage = () => {
   const [enviando, setEnviando] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [erro404, setErro404] = useState(false);
+  const [passo, setPasso] = useState(1);
 
   useEffect(() => {
     const fetchTenant = async () => {
@@ -37,7 +41,8 @@ const AgendamentoPage = () => {
     fetchTenant();
   }, [slug]);
 
-  const podeAgendar = nome && procedimentoSelecionado && horarioSelecionado && email;
+  const podeAgendar =
+    nome && procedimentoSelecionado && horarioSelecionado && email;
 
   const handleAgendar = async () => {
     if (!podeAgendar) return;
@@ -46,14 +51,13 @@ const AgendamentoPage = () => {
     setMensagem("");
 
     try {
-
       await criarAgendamento({
         procedimentoId: procedimentoSelecionado,
         dateTime: horarioSelecionado,
         email,
         telefone,
         tenantId: tenant.id,
-        nome
+        nome,
       });
       setProcedimentoSelecionado(null);
       setHorarioSelecionado(null);
@@ -78,99 +82,82 @@ const AgendamentoPage = () => {
             <p className="text-gray-600">Página não encontrada.</p>
           </div>
         </div>
-        ) : tenant ? (
+      ) : tenant ? (
         <>
-          <div className="bg-blue-600 h-48 w-full"></div>
+          <HeaderTenant tenant={tenant} />
 
-          <div className="relative flex flex-col items-center -mt-16 px-4">
-            {tenant.img ? (
-              <img
-                src={`${BASE_URL}/uploads/${tenant.img}`}
-                alt={`Logo de ${tenant.nome}`}
-                className="w-32 h-32 rounded-full border-4 border-white shadow-md object-cover"
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full bg-gray-300 border-4 border-white shadow-md flex items-center justify-center text-gray-500 text-sm">
-                Sem imagem
-              </div>
-            )}
+          <div className="max-w-2xl mx-auto mt-8 px-4">
+            <ContainerEtapa>
+              {passo === 1 && (
+                <BlocoProcedimento
+                  procedimentos={tenant.procedimentos}
+                  onSelecionar={setProcedimentoSelecionado}
+                />
+              )}
 
-            <h1 className="text-2xl font-bold text-gray-800 mt-4">
-              {tenant.nome}
-            </h1>
-            <p className="text-gray-500">@{tenant.slug}</p>
-          </div>
+              {passo === 2 && (
+                <BlocoDataEHorario
+                  tenantId={tenant.id}
+                  disponibilidadeSemanal={tenant.disponibilidades}
+                  onSelecionar={setHorarioSelecionado}
+                />
+              )}
 
-          <div className="max-w-2xl mx-auto mt-8 px-4 space-y-6">
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <SelecionarProcedimento
-                procedimentos={tenant.procedimentos}
-                onSelecionar={(idSelecionado) =>
-                  setProcedimentoSelecionado(idSelecionado)
-                }
-              />
-            </div>
+              {passo === 3 && (
+                <BlocoContato
+                  nome={nome}
+                  setNome={setNome}
+                  email={email}
+                  setEmail={setEmail}
+                  telefone={telefone}
+                  setTelefone={setTelefone}
+                />
+              )}
+            </ContainerEtapa>
 
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <SelecionarDataEHorario
-                tenantId={tenant.id}
-                disponibilidadeSemanal={tenant.disponibilidades}
-                onSelecionar={(horarioCompleto) =>
-                  setHorarioSelecionado(horarioCompleto)
-                }
-              />
-            </div>
+            <div className="flex justify-between mt-6">
+              {passo > 1 ? (
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  onClick={() => setPasso(passo - 1)}
+                >
+                  Voltar
+                </button>
+              ) : (
+                <div />
+              )}
 
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <label className="block text-gray-700 mb-2">Como deseja ser chamado(a)</label>
-              <input
-                type="txt"
-                className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-              />
-              <label className="block text-gray-700 mb-2">E-mail:</label>
-              <input
-                type="email"
-                className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="voce@email.com"
-              />
-              <label className="block text-gray-700 mb-2">Telefone/Whatsapp:</label>
-              <input
-                type="tel"
-                className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={telefone}
-                onChange={(e) => setTelefone(e.target.value)}
-                placeholder="(99) 99999-9999"
-              />
-            
-            </div>
-
-            <div className="text-center">
-              <button
-                onClick={handleAgendar}
-                disabled={!podeAgendar || enviando}
-                className={`w-full py-3 rounded text-white font-semibold transition ${
-                  podeAgendar && !enviando
-                    ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
-              >
-                {enviando ? "Enviando..." : "Confirmar Agendamento"}
-              </button>
-
-              {mensagem && (
-                <p className="mt-4 text-center text-sm text-gray-600">
-                  {mensagem}
-                </p>
+              {passo < 3 ? (
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  onClick={() => setPasso(passo + 1)}
+                  disabled={
+                    (passo === 1 && !procedimentoSelecionado) ||
+                    (passo === 2 && !horarioSelecionado)
+                  }
+                >
+                  Próximo
+                </button>
+              ) : (
+                <button
+                  onClick={handleAgendar}
+                  disabled={!podeAgendar || enviando}
+                  className={`px-4 py-2 rounded text-white font-semibold transition ${
+                    podeAgendar && !enviando
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  {enviando ? "Enviando..." : "Confirmar Agendamento"}
+                </button>
               )}
             </div>
           </div>
+
           {/* Rodapé */}
           <footer className="bg-gray-200 text-gray-700 text-center py-4 mt-6">
-            © {new Date().getFullYear()} ZendaaVip. Todos os direitos reservados.
+            © {new Date().getFullYear()} ZendaaVip. Todos os direitos
+            reservados.
           </footer>
         </>
       ) : (
