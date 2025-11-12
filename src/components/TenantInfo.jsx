@@ -4,6 +4,7 @@ import {
   uploadImagemTenantCover,
 } from "../services/apiService";
 import { BASE_URL } from "../services/apiService";
+import PublicBookingLink from "./PublicBookingLink";
 
 export default function TenantInfo({ nome, slug, srcImg, coverImg }) {
   const [imgError, setImgError] = useState(false);
@@ -43,7 +44,8 @@ export default function TenantInfo({ nome, slug, srcImg, coverImg }) {
     }
   };
 
-  const capaURL = previewCover || (coverSrc ? `${BASE_URL}/uploads/${coverSrc}` : null);
+  const capaURL =
+    previewCover || (coverSrc ? `${BASE_URL}/uploads/${coverSrc}` : null);
 
   return (
     <div className="relative w-full">
@@ -62,7 +64,6 @@ export default function TenantInfo({ nome, slug, srcImg, coverImg }) {
         accept="image/*"
         onChange={(e) => handleUploadProfile(e.target.files[0])}
       />
-
       {/* ✅ CAPA COMO BACKGROUND — menor e com sobreposição */}
       <div
         className="w-full h-40 rounded-xl cursor-pointer bg-gray-200 border border-gray-300"
@@ -79,7 +80,6 @@ export default function TenantInfo({ nome, slug, srcImg, coverImg }) {
           </div>
         )}
       </div>
-
       {/* ✅ CONTEÚDO QUE SE SOBREPÕE À CAPA */}
       <div className="flex items-center gap-6 px-2 -mt-12 relative">
         {/* Foto de perfil */}
@@ -102,20 +102,10 @@ export default function TenantInfo({ nome, slug, srcImg, coverImg }) {
           </div>
         )}
 
-        {/* Texto */}
         <div className="mt-10">
           <h1 className="text-3xl font-bold text-gray-900">{nome}</h1>
-          <p className="text-gray-700 text-lg mt-2">
-            Seus clientes poderão agendar através do link: <br />
-            <a
-              href={`https://zendaavip.com.br/${slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-indigo-600 hover:text-indigo-800 font-medium"
-            >
-              zendaavip.com.br/{slug}
-            </a>
-          </p>
+
+          <PublicBookingLink slug={slug}></PublicBookingLink>
         </div>
       </div>
     </div>

@@ -46,6 +46,7 @@ export const getTenant = () => api.get('/tenant')
 export const checkLogin = () => api.get('/auth/check')
 export const logout = () => api.post('/auth/logout');
 export const cancelarAgendamento = (tenantId) => api.delete(`/agendamento/${tenantId}`)
+export const updateSlug = (slugUnique, slug) => api.post(`/tenant/edit/${slugUnique}`, { slug })
 
 export const uploadImagemTenant = (file) => {
   const formData = new FormData();

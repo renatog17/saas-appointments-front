@@ -180,7 +180,7 @@ export default function DashBoard() {
 
           {tenant && activeTab === "config" && (
             <section className="bg-white p-6 rounded-xl shadow text-gray-600">
-              <Disponibilidade lista={tenant.disponibilidades} />
+              <Disponibilidade lista={tenant.disponibilidades} onUpdated={carregarTenant}/>
             </section>
           )}
         </main>

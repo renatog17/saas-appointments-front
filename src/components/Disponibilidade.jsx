@@ -16,7 +16,8 @@ const horas = Array.from({ length: 24 }, (_, i) => {
   return `${h}:00`;
 });
 
-export default function Disponibilidade({ lista }) {
+export default function Disponibilidade({ lista, onUpdated }) {
+
   const [diasSelecionados, setDiasSelecionados] = useState({});
   const [error, setError] = useState(null);
 
@@ -92,6 +93,7 @@ export default function Disponibilidade({ lista }) {
   }
 
   function handleFinish() {
+    alert("disponibilidades atualizadas!");
     setError(null);
 
     const diasFinal = [];
@@ -125,13 +127,8 @@ export default function Disponibilidade({ lista }) {
       });
 
     }
-    
-    if (diasFinal.length === 0) {
-      setError("Selecione pelo menos um dia e defina os horários.");
-      return;
-    }
     atualizarDisponibilidade(diasFinal).then(() => {
-      
+      if (onUpdated) onUpdated(); 
     }).catch(() => {
       setError("Erro ao atualizar disponibilidades. Tente novamente.");
     });
@@ -241,7 +238,7 @@ export default function Disponibilidade({ lista }) {
         onClick={handleFinish}
         className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition"
       >
-        Finalizar cadastro
+        Atualizar
       </button>
     </div>
   );
