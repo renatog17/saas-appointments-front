@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import Agendamentos from "../../components/Agendamentos";
 import ConfirmacaoEmail from "../../components/ConfirmacaoEmail";
+import ProcedimentoDuracao from "../../components/ProcedimentoDuracao";
 import Sidebar from "../../components/SideBar";
 
 export default function DashBoard() {
@@ -173,6 +174,7 @@ export default function DashBoard() {
 
           {!loading && tenant && activeTab === "procedimentos" && (
             <section className="bg-white p-6 rounded-xl shadow">
+              <ProcedimentoDuracao intervaloEmMinutos={tenant.intervaloEmMinutos} ></ProcedimentoDuracao>
               <Procedimento lista={tenant.procedimentos} />
               <ProcedimentoForm onCriado={carregarTenant} />
             </section>

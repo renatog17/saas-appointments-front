@@ -1,4 +1,7 @@
-export default function SelecionarProcedimento({ procedimentos, onSelecionar }) {
+export default function SelecionarProcedimento({
+  procedimentos,
+  onSelecionar,
+}) {
   return (
     <div className="mb-4">
       <h2 className="text-lg font-bold mb-4">Selecione um procedimento:</h2>
@@ -17,11 +20,19 @@ export default function SelecionarProcedimento({ procedimentos, onSelecionar }) 
               onChange={() => onSelecionar(proc.id)}
             />
 
+            {/* IMAGEM */}
+            {proc.image && (
+              <img
+                src={`http://localhost:8080/uploads/${proc.image}`}
+                alt={proc.nome}
+                className="w-16 h-16 object-cover rounded-md"
+              />
+            )}
+
+            {/* Nome + Descrição */}
             <div className="flex-1">
-              {/* Nome */}
               <p className="font-semibold text-gray-800">{proc.nome}</p>
 
-              {/* Descrição */}
               {proc.descricao && (
                 <p className="text-gray-600 text-sm mt-1">{proc.descricao}</p>
               )}

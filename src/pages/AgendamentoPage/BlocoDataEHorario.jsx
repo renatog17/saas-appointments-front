@@ -8,8 +8,8 @@ export default function SelecionarDataEHorario({
   tenantId,
   onSelecionar,
   disponibilidadeSemanal,
+  intervaloEmMinutos,
 }) {
-  
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [agendamentos, setAgendamentos] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -36,37 +36,47 @@ export default function SelecionarDataEHorario({
       horarios.push(
         `${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`
       );
-      hora += 1; // intervalo de 1 hora
+
+      // soma o intervalo em minutos
+      minuto += intervaloEmMinutos;
+
+      // se passar de 60, ajusta a hora
+      while (minuto >= 60) {
+        minuto -= 60;
+        hora++;
+      }
     }
 
     return horarios;
   };
 
   // Geramos todos os horários para cada intervalo
-const horariosDisponiveis =
-  horariosDoDia.length > 0
-    ? horariosDoDia
-        .flatMap((d) => gerarHorarios(d.inicio, d.fim))
-        .filter((hora) => {
-          // Filtra os horários que já não estão agendados
-          const dateStr = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
-          return !agendamentos.some((a) => {
-            const aDate = new Date(a.dateTime);
-            const aDateStr = aDate.toISOString().split("T")[0];
-            const aHour = String(aDate.getHours()).padStart(2, "0") + ":00"; // assume intervalo de 1h
-            return dateStr === aDateStr && hora === aHour;
-          });
-        })
-    : [];
+  const horariosDisponiveis =
+    horariosDoDia.length > 0
+      ? horariosDoDia
+          .flatMap((d) => gerarHorarios(d.inicio, d.fim))
+          .filter((hora) => {
+            // Filtra os horários que já não estão agendados
+            const dateStr = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+            return !agendamentos.some((a) => {
+              const aDate = new Date(a.dateTime);
+              const aDateStr = aDate.toISOString().split("T")[0];
+              const aHour =
+                String(aDate.getHours()).padStart(2, "0") +
+                ":" +
+                String(aDate.getMinutes()).padStart(2, "0");
 
+              return dateStr === aDateStr && hora === aHour;
+            });
+          })
+      : [];
 
   useEffect(() => {
     const fetchAgendamentos = async () => {
       try {
         const response = await getHorariosAgendamentos(tenantId);
-        console.log(response.data)
+        console.log(response.data);
         setAgendamentos(response.data);
-
       } catch (erro) {
         console.error(erro);
       }
@@ -96,27 +106,27 @@ const horariosDisponiveis =
 
       <div className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center w-full max-w-md">
         <Calendar
-  onChange={setSelectedDate}
-  value={selectedDate}
-  minDate={new Date()}
-  className="rounded-xl shadow-lg p-4 bg-white"
-  tileDisabled={({ date, view }) => {
-    if (view === "month") {
-      const diaSemana = date.getDay();
-      return !diasPermitidos.has(diaSemana);
-    }
-    return false;
-  }}
-  tileClassName={({ date, view }) => {
-    if (view === "month") {
-      const diaSemana = date.getDay();
-      if (!diasPermitidos.has(diaSemana)) {
-        return "dia-indisponivel"; // classe custom
-      }
-    }
-    return "";
-  }}
-/>
+          onChange={setSelectedDate}
+          value={selectedDate}
+          minDate={new Date()}
+          className="rounded-xl shadow-lg p-4 bg-white"
+          tileDisabled={({ date, view }) => {
+            if (view === "month") {
+              const diaSemana = date.getDay();
+              return !diasPermitidos.has(diaSemana);
+            }
+            return false;
+          }}
+          tileClassName={({ date, view }) => {
+            if (view === "month") {
+              const diaSemana = date.getDay();
+              if (!diasPermitidos.has(diaSemana)) {
+                return "dia-indisponivel"; // classe custom
+              }
+            }
+            return "";
+          }}
+        />
 
         <div className="mt-4 w-full max-w-md">
           <h2 className="text-lg font-semibold mb-2">Horários disponíveis:</h2>

@@ -113,9 +113,6 @@ export default function Procedimento({ lista }) {
         }));
       };
       img.src = url;
-
-      // opcional: informar usuário
-      // alert("Imagem enviada! Preview exibido localmente.");
     } catch (err) {
       console.error(err);
       alert("Erro ao enviar imagem.");

@@ -66,7 +66,7 @@ const AgendamentoPage = () => {
       setNome("");
       navigate("/agendamento/sucesso");
     } catch (erro) {
-      setMensagem("Erro ao agendar. Tente novamente.");
+      setMensagem("Erro ao agendar, pois o horário escolhido pode não estar mais disponível. Atualize a página para tentar novamente.");
       console.error(erro);
     } finally {
       setEnviando(false);
@@ -99,6 +99,7 @@ const AgendamentoPage = () => {
                 <BlocoDataEHorario
                   tenantId={tenant.id}
                   disponibilidadeSemanal={tenant.disponibilidades}
+                  intervaloEmMinutos={tenant.intervaloEmMinutos}
                   onSelecionar={setHorarioSelecionado}
                 />
               )}
@@ -114,6 +115,11 @@ const AgendamentoPage = () => {
                 />
               )}
             </ContainerEtapa>
+            {mensagem && (
+              <div className="mt-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded">
+                {mensagem}
+              </div>
+            )}
 
             <div className="flex justify-between mt-6">
               {passo > 1 ? (
