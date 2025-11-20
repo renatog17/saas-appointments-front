@@ -56,17 +56,22 @@ export default function SelecionarDataEHorario({
       ? horariosDoDia
           .flatMap((d) => gerarHorarios(d.inicio, d.fim))
           .filter((hora) => {
-            // Filtra os horários que já não estão agendados
-            const dateStr = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
-            return !agendamentos.some((a) => {
-              const aDate = new Date(a.dateTime);
-              const aDateStr = aDate.toISOString().split("T")[0];
-              const aHour =
-                String(aDate.getHours()).padStart(2, "0") +
-                ":" +
-                String(aDate.getMinutes()).padStart(2, "0");
+            const dateStr = selectedDate.toISOString().split("T")[0]; // YYYY-MM-DD
 
-              return dateStr === aDateStr && hora === aHour;
+            return !agendamentos.some((a) => {
+              const inicio = new Date(a.dateTime);
+              const fim = new Date(a.dateTimeTermino);
+
+              const aDateStr = inicio.toISOString().split("T")[0];
+              if (aDateStr !== dateStr) return false;
+
+              // horário atual convertido para Date na data selecionada
+              const [h, m] = hora.split(":").map(Number);
+              const horaSelecionada = new Date(selectedDate);
+              horaSelecionada.setHours(h, m, 0, 0);
+
+              // bloqueia se horaSelecionada estiver dentro do intervalo [inicio, fim)
+              return horaSelecionada >= inicio && horaSelecionada < fim;
             });
           })
       : [];
