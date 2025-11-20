@@ -1,3 +1,5 @@
+import { BASE_URL } from "../../services/apiService";
+
 export default function SelecionarProcedimento({
   procedimentos,
   onSelecionar,
@@ -20,25 +22,21 @@ export default function SelecionarProcedimento({
               onChange={() => onSelecionar(proc.id)}
             />
 
-            {/* IMAGEM */}
             {proc.image && (
               <img
-                src={`http://localhost:8080/uploads/${proc.image}`}
+                src={`${BASE_URL}/uploads/${proc.image}`}
                 alt={proc.nome}
                 className="w-16 h-16 object-cover rounded-md"
               />
             )}
 
-            {/* Nome + Descrição */}
             <div className="flex-1">
               <p className="font-semibold text-gray-800">{proc.nome}</p>
-
               {proc.descricao && (
                 <p className="text-gray-600 text-sm mt-1">{proc.descricao}</p>
               )}
             </div>
 
-            {/* Valor */}
             {proc.valor && (
               <div className="text-right font-semibold text-blue-600 whitespace-nowrap">
                 R$ {Number(proc.valor).toFixed(2).replace(".", ",")}
