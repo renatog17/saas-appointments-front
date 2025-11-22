@@ -18,6 +18,7 @@ import Agendamentos from "../../components/Agendamentos";
 import ConfirmacaoEmail from "../../components/ConfirmacaoEmail";
 import ProcedimentoDuracao from "../../components/ProcedimentoDuracao";
 import Sidebar from "../../components/SideBar";
+import Notificacoes from "../../components/Notificacoes";
 
 export default function DashBoard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -183,6 +184,13 @@ export default function DashBoard() {
           {tenant && activeTab === "config" && (
             <section className="bg-white p-6 rounded-xl shadow text-gray-600">
               <Disponibilidade lista={tenant.disponibilidades} onUpdated={carregarTenant}/>
+            </section>
+          )}
+
+          {tenant && activeTab === "notificacoes" && (
+            <section className="bg-white p-6 rounded-xl shadow text-gray-600">
+              <Notificacoes />
+              
             </section>
           )}
         </main>

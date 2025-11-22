@@ -49,7 +49,8 @@ export const cancelarAgendamento = (tenantId) => api.delete(`/agendamento/${tena
 export const updateSlug = (slugUnique, slug) => api.post(`/tenant/edit/${slugUnique}`, { slug })
 export const updateDuracaoEmMinutos = (duracaoEmMinutos) =>
     api.put(`/tenant`, { duracao: duracaoEmMinutos });
-
+export const updateReceberAgendaDiariaPorEmail = (receberAgendaDiariaPorEmail) =>
+    api.put(`/tenant/agendadiaria`, { receberAgendaDiariaPorEmail });
 //export const updateDuracaoEmMinutos = (duracaoEmMinutos) => api.put(`/tenant`, duracaoEmMinutos)
 
 export const uploadImagemTenant = (file) => {
