@@ -1,9 +1,9 @@
 # Appointment Frontend
 
 Frontend da aplicação de agendamentos Appointment.  
-Criado para resolver um problema real: ajudar minha cabeleireira a organizar os horários dos clientes de forma simples, rápida e prática.
-
+Criado para resolver um problema real: ajudar uma cabeleireira a organizar os horários dos clientes de forma simples, rápida e prática.
 ---
+Back end disponível em [appointments-back](https://github.com/renatog17/saas-appointments-back)
 
 ## 🛠️ Tecnologias
 
