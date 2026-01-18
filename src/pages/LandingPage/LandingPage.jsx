@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { Clock, Mail, LayoutDashboard, Store } from "lucide-react";
 
 function LandingPage() {
-
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
       {/* Cabeçalho */}
@@ -42,6 +41,23 @@ function LandingPage() {
         </Link>
       </section>
 
+      <section className="bg-indigo-600 text-white py-12 px-4">
+        <div className="max-w-xl mx-auto text-center flex flex-col items-center gap-6">
+          <h3 className="text-3xl font-bold">Plano único</h3>
+
+          <p className="text-5xl font-extrabold">R$ 20</p>
+
+          <p className="text-lg">por mês, sem taxas ocultas</p>
+
+          <Link
+            to="/cadastro"
+            className="bg-white text-indigo-600 px-6 py-3 rounded text-lg font-medium hover:bg-gray-100 transition"
+          >
+            Assinar agora
+          </Link>
+        </div>
+      </section>
+
       {/* Benefícios */}
       <section className="bg-white py-12 px-4 text-center">
         <h3 className="text-2xl font-semibold mb-6">
@@ -67,8 +83,6 @@ function LandingPage() {
         </div>
       </section>
 
-      
-
       {/* Rodapé */}
       <footer className="bg-white p-4 text-center text-sm text-gray-500">
         © {new Date().getFullYear()} Zendaa. Todos os direitos reservados.
@@ -76,4 +90,5 @@ function LandingPage() {
     </div>
   );
 }
+
 export default LandingPage;

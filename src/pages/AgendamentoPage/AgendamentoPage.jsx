@@ -59,14 +59,40 @@ const AgendamentoPage = () => {
         tenantId: tenant.id,
         nome,
       });
+
+      // limpar estado
       setProcedimentoSelecionado(null);
       setHorarioSelecionado(null);
       setEmail("");
       setTelefone("");
       setNome("");
+
       navigate("/agendamento/sucesso");
     } catch (erro) {
-      setMensagem("Erro ao agendar, pois o horário escolhido pode não estar mais disponível. Atualize a página para tentar novamente.");
+      let msg =
+        "Erro ao agendar, pois o horário escolhido pode não estar mais disponível. Atualize a página para tentar novamente.";
+
+      const data = erro.response?.data;
+
+      if (data) {
+        // Se já for array de objetos
+        if (Array.isArray(data)) {
+          msg = data.map((e) => e.mensagem).join(", ");
+        }
+        // Se for string JSON (como no seu caso)
+        else if (typeof data === "string") {
+          try {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) {
+              msg = parsed.map((e) => e.mensagem).join(", ");
+            }
+          } catch (e) {
+            // fallback permanece
+          }
+        }
+      }
+
+      setMensagem(msg);
       console.error(erro);
     } finally {
       setEnviando(false);
