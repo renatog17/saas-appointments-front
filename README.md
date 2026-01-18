@@ -1,13 +1,26 @@
-# React + Vite
+# Appointment Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend da aplicação de agendamentos Appointment.  
+Criado para resolver um problema real: ajudar uma cabeleireira a organizar os horários dos clientes de forma simples, rápida e prática.
+---
+Back end disponível em [appointments-back](https://github.com/renatog17/saas-appointments-back)
 
-Currently, two official plugins are available:
+## 🛠️ Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React**  
+- **Vite**  
+- **Tailwind CSS**  
+- Fetch API para comunicação com o backend  
+- Fluxo simples de autenticação usando JWT
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# saas-appointments-front
+## 🎯 Caso de Uso Real
+
+O sistema foi desenvolvido para substituir o controle manual de horários da minha cabeleireira.  
+Ele facilita:
+
+- Criar e visualizar agendamentos  
+- Evitar conflitos de horário  
+- Confirmar ou cancelar compromissos  
+- Manter tudo organizado em um único lugar
