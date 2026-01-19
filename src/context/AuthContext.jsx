@@ -25,9 +25,11 @@ export function AuthProvider({ children }) {
   async function realizarLogout() {
     try {
       await logout();
-      setAuthenticated(false);
     } catch (err) {
       console.error("Erro ao fazer logout no contexto:", err);
+    } finally {
+     
+      setAuthenticated(false);
     }
   }
 
